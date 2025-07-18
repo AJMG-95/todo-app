@@ -1,0 +1,200 @@
+<div class="flex flex-col justify-center gap-12  w-full">
+  <!-- Introducción -->
+  <p-card>
+    <section aria-labelledby="intro-heading" class="p-8">
+      <h1 id="intro-heading" class="text-3xl font-bold mb-4">
+        Bienvenido a ToDoApp 🎯
+      </h1>
+      <p class="text-lg text-gray-700 dark:text-gray-300">
+        Esta aplicación te ayuda a gestionar tus tareas de forma eficaz.
+        Desarrollada con:
+      </p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <p-chip
+          label="Angular 18.2.13"
+          image="assets/logos/angular_logo.webp"
+          alt="Angular logo"
+        />
+        <p-chip
+          label="Tailwind CSS 3.4.17"
+          image="assets/logos/tailwind_logo.webp"
+          alt="Tailwind logo"
+        />
+        <p-chip
+          label="PrimeNG 18.0.2"
+          image="assets/logos/primeng_logo.webp"
+          alt="PrimeNG logo"
+        />
+        <p-chip
+          label="PrimeIcons 7.0.0"
+          image="assets/logos/primeng_logo.webp"
+          alt="PrimeIcons logo"
+        />
+        <p-chip
+          label="PrimeFlex 4.0.0"
+          image="assets/logos/primeflex_logo.webp"
+          alt="PrimeFlex logo"
+        />
+        <p-chip
+          label="LocalStorage"
+          image="assets/logos/storage_logo.webp"
+          alt="LocalStorage icon"
+        />
+      </div>
+    </section>
+  </p-card>
+
+  <p-divider />
+
+  <!-- Tecnologías -->
+  <p-card>
+    <section aria-labelledby="tech-heading" class="p-8">
+      <h2 id="tech-heading" class="text-2xl font-semibold mb-6">
+        Tecnologías utilizadas
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Angular -->
+        <p-card header="Angular">
+          <img
+            src="assets/logos/angular_logo.webp"
+            alt="Angular Logo"
+            class="w-16 h-16 mx-auto mb-4"
+          />
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+            <strong>Versión:</strong> 18.2.13
+          </p>
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300 mt-2">
+            Framework principal para construir esta SPA con arquitectura
+            standalone.
+          </p>
+        </p-card>
+
+        <!-- Tailwind CSS -->
+        <p-card header="Tailwind CSS">
+          <img
+            src="assets/logos/tailwind_logo.webp"
+            alt="Tailwind Logo"
+            class="w-16 h-16 mx-auto mb-4"
+          />
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+            <strong>Versión:</strong> 3.4.17
+          </p>
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300 mt-2">
+            Framework de utilidades para diseñar la interfaz con responsividad y
+            accesibilidad.
+          </p>
+        </p-card>
+
+        <!-- PrimeNG -->
+        <p-card header="PrimeNG">
+          <img
+            src="assets/logos/primeng_logo.webp"
+            alt="PrimeNG Logo"
+            class="w-16 h-16 mx-auto mb-4"
+          />
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+            <strong>Versión:</strong> 18.0.2
+          </p>
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300 mt-2">
+            Biblioteca de componentes UI rica y moderna, integrada con Angular.
+          </p>
+        </p-card>
+
+        <!-- PrimeIcons -->
+        <p-card header="PrimeIcons">
+          <img
+            src="assets/logos/primeng_logo.webp"
+            alt="PrimeIcons Logo"
+            class="w-16 h-16 mx-auto mb-4"
+          />
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+            <strong>Versión:</strong> 7.0.0
+          </p>
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300 mt-2">
+            Conjunto de iconos usados en componentes como botones, chips y
+            menús.
+          </p>
+        </p-card>
+
+        <!-- PrimeFlex -->
+        <p-card header="PrimeFlex">
+          <img
+            src="assets/logos/primeflex_logo.webp"
+            alt="PrimeFlex Logo"
+            class="w-16 h-16 mx-auto mb-4"
+          />
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+            <strong>Versión:</strong> 4.0.0
+          </p>
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300 mt-2">
+            Utilidades CSS de PrimeNG para layout y espaciado flexibles.
+          </p>
+        </p-card>
+
+        <!-- LocalStorage -->
+        <p-card header="LocalStorage">
+          <img
+            src="assets/logos/storage_logo.webp"
+            alt="LocalStorage Icon"
+            class="w-16 h-16 mx-auto mb-4 rounded-md"
+          />
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300">
+            <strong>Versión:</strong> API nativa del navegador
+          </p>
+          <p class="text-center text-sm text-gray-700 dark:text-gray-300 mt-2">
+            Usado para persistir datos del usuario sin necesidad de backend.
+          </p>
+        </p-card>
+      </div>
+    </section>
+  </p-card>
+
+  <p-divider />
+
+  <!-- Sobre el autor -->
+  <p-card>
+    <section
+      aria-labelledby="author-heading"
+      class="flex flex-col md:flex-row items-center gap-6 p-8"
+    >
+      <p-avatar
+        shape="circle"
+        styleClass="w-24 h-24 text-xl"
+        label="AJ"
+        class="bg-[3b82f6] text-white"
+      ></p-avatar>
+
+      <div>
+        <h2 id="author-heading" class="text-2xl font-semibold mb-2">
+          Sobre el autor
+        </h2>
+        <p class="text-gray-700 dark:text-gray-300">
+          Desarrollado por <strong>Antonio Jesús Marchena Guerrero</strong>,
+          apasionado del desarrollo frontend con experiencia en Angular,
+          Flutter, y más.
+        </p>
+        <div class="mt-4 flex gap-4 flex-wrap">
+          <a
+            pButton
+            href="https://ajmg-95.github.io/portfolio/"
+            target="_blank"
+            rel="noopener noreferrer"
+            icon="pi pi-globe"
+            label="Ver portfolio"
+            class="p-button-sm p-button-outlined"
+          ></a>
+          <a
+            pButton
+            href="https://github.com/AJMG-95"
+            target="_blank"
+            rel="noopener noreferrer"
+            icon="pi pi-github"
+            label="GitHub"
+            class="p-button-sm p-button-secondary"
+          ></a>
+        </div>
+      </div>
+    </section>
+  </p-card>
+</div>
