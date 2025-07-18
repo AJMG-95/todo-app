@@ -69,13 +69,14 @@ export class TodoPageComponent implements OnInit {
     this.taskService.getStatuses().subscribe(statuses => {
       this.statuses = statuses;
 
-      // Añadir opción "Todos" con id = 0 al principio
+      // Opciones para el filtro (sí incluye "Todos")
       this.statusOptions = [
         { label: 'Todos', value: 0 },
         ...statuses.map(s => ({ label: s.nameStatus, value: s.id }))
       ];
     });
   }
+
 
 
   applyFilters(): void {
@@ -153,9 +154,20 @@ export class TodoPageComponent implements OnInit {
   }
 
   onStatusChange(task: Task): void {
+    if (task.statusId === 0) {
+      // Restaurar el valor anterior o simplemente salir sin guardar
+      this.applyFilters(); // refresca la lista para evitar inconsistencias
+      return;
+    }
+
     this.taskService.updateTask(task);
-    this.applyFilters(); // Opcional, si deseas refrescar la vista
+    this.applyFilters();
   }
+
+  get editableStatusOptions() {
+    return this.statusOptions.filter(s => s.value !== 0);
+  }
+
 
 
 }

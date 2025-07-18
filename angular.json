@@ -32,7 +32,8 @@
               "node_modules/primeicons/primeicons.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "baseHref": "/todo-app/"
           },
           "configurations": {
             "production": {
@@ -93,6 +94,9 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }

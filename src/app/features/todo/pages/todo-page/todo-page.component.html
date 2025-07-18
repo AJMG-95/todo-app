@@ -224,7 +224,7 @@
             <!-- Estado -->
             <td>
               <p-dropdown
-                [options]="statusOptions"
+                [options]="editableStatusOptions"
                 [(ngModel)]="task.statusId"
                 optionLabel="label"
                 optionValue="value"
@@ -233,7 +233,7 @@
                   'bg-gray-200': task.statusId === 1,
                   'bg-yellow-100': task.statusId === 2,
                   'bg-green-100': task.statusId === 3,
-                  'bg-red-100': task.statusId === 4,
+                  'bg-red-100': task.statusId === 4
                 }"
                 class="w-full"
                 (onChange)="onStatusChange(task)"
@@ -246,60 +246,131 @@
               {{ task.createdAt }}
             </td>
 
+            <td
+              (click)="
+                !isEditing(task.id, 'startDate') &&
+                  startEditing(task.id, 'startDate')
+              "
+            >
+              <ng-container
+                *ngIf="isEditing(task.id, 'startDate'); else startDisplay"
+              >
+                <p-calendar
+                  [(ngModel)]="task.startDate"
+                  dateFormat="yy-mm-dd"
+                  showIcon
+                  (click)="$event.stopPropagation()"
+                ></p-calendar>
+                <div class="flex gap-1 mt-1">
+                  <button
+                    pButton
+                    icon="pi pi-check"
+                    class="p-button-sm p-button-success"
+                    (click)="
+                      saveEdit(task, 'startDate'); $event.stopPropagation()
+                    "
+                  ></button>
+                  <button
+                    pButton
+                    icon="pi pi-times"
+                    class="p-button-sm p-button-danger"
+                    (click)="
+                      cancelEdit(task.id, 'startDate'); $event.stopPropagation()
+                    "
+                  ></button>
+                </div>
+              </ng-container>
+              <ng-template #startDisplay>
+                <i class="pi pi-calendar mr-1 text-gray-400"></i>
+                <span>{{ task.startDate }}</span>
+              </ng-template>
+            </td>
 
-  <td (click)="!isEditing(task.id, 'startDate') && startEditing(task.id, 'startDate')">
-    <ng-container *ngIf="isEditing(task.id, 'startDate'); else startDisplay">
-      <p-calendar [(ngModel)]="task.startDate" dateFormat="yy-mm-dd" showIcon
-        (click)="$event.stopPropagation()"></p-calendar>
-      <div class="flex gap-1 mt-1">
-        <button pButton icon="pi pi-check" class="p-button-sm p-button-success"
-          (click)="saveEdit(task, 'startDate'); $event.stopPropagation()"></button>
-        <button pButton icon="pi pi-times" class="p-button-sm p-button-danger"
-          (click)="cancelEdit(task.id, 'startDate'); $event.stopPropagation()"></button>
-      </div>
-    </ng-container>
-    <ng-template #startDisplay>
-      <i class="pi pi-calendar mr-1 text-gray-400"></i>
-      <span>{{ task.startDate }}</span>
-    </ng-template>
-  </td>
+            <td
+              (click)="
+                !isEditing(task.id, 'estimatedEndDate') &&
+                  startEditing(task.id, 'estimatedEndDate')
+              "
+            >
+              <ng-container
+                *ngIf="
+                  isEditing(task.id, 'estimatedEndDate');
+                  else estimatedDisplay
+                "
+              >
+                <p-calendar
+                  [(ngModel)]="task.estimatedEndDate"
+                  dateFormat="yy-mm-dd"
+                  showIcon
+                  (click)="$event.stopPropagation()"
+                ></p-calendar>
+                <div class="flex gap-1 mt-1">
+                  <button
+                    pButton
+                    icon="pi pi-check"
+                    class="p-button-sm p-button-success"
+                    (click)="
+                      saveEdit(task, 'estimatedEndDate');
+                      $event.stopPropagation()
+                    "
+                  ></button>
+                  <button
+                    pButton
+                    icon="pi pi-times"
+                    class="p-button-sm p-button-danger"
+                    (click)="
+                      cancelEdit(task.id, 'estimatedEndDate');
+                      $event.stopPropagation()
+                    "
+                  ></button>
+                </div>
+              </ng-container>
+              <ng-template #estimatedDisplay>
+                <i class="pi pi-calendar mr-1 text-gray-400"></i>
+                <span>{{ task.estimatedEndDate }}</span>
+              </ng-template>
+            </td>
 
-
-          <td (click)="!isEditing(task.id, 'estimatedEndDate') && startEditing(task.id, 'estimatedEndDate')">
-            <ng-container *ngIf="isEditing(task.id, 'estimatedEndDate'); else estimatedDisplay">
-              <p-calendar [(ngModel)]="task.estimatedEndDate" dateFormat="yy-mm-dd" showIcon
-                (click)="$event.stopPropagation()"></p-calendar>
-              <div class="flex gap-1 mt-1">
-                <button pButton icon="pi pi-check" class="p-button-sm p-button-success"
-                  (click)="saveEdit(task, 'estimatedEndDate'); $event.stopPropagation()"></button>
-                <button pButton icon="pi pi-times" class="p-button-sm p-button-danger"
-                  (click)="cancelEdit(task.id, 'estimatedEndDate'); $event.stopPropagation()"></button>
-              </div>
-            </ng-container>
-            <ng-template #estimatedDisplay>
-              <i class="pi pi-calendar mr-1 text-gray-400"></i>
-              <span>{{ task.estimatedEndDate }}</span>
-            </ng-template>
-          </td>
-
-
-  <td (click)="!isEditing(task.id, 'realEndDate') && startEditing(task.id, 'realEndDate')">
-    <ng-container *ngIf="isEditing(task.id, 'realEndDate'); else realDisplay">
-      <p-calendar [(ngModel)]="task.realEndDate" dateFormat="yy-mm-dd" showIcon
-        (click)="$event.stopPropagation()"></p-calendar>
-      <div class="flex gap-1 mt-1">
-        <button pButton icon="pi pi-check" class="p-button-sm p-button-success"
-          (click)="saveEdit(task, 'realEndDate'); $event.stopPropagation()"></button>
-        <button pButton icon="pi pi-times" class="p-button-sm p-button-danger"
-          (click)="cancelEdit(task.id, 'realEndDate'); $event.stopPropagation()"></button>
-      </div>
-    </ng-container>
-    <ng-template #realDisplay>
-      <i class="pi pi-calendar mr-1 text-gray-400"></i>
-      <span>{{ task.realEndDate }}</span>
-    </ng-template>
-  </td>
-
+            <td
+              (click)="
+                !isEditing(task.id, 'realEndDate') &&
+                  startEditing(task.id, 'realEndDate')
+              "
+            >
+              <ng-container
+                *ngIf="isEditing(task.id, 'realEndDate'); else realDisplay"
+              >
+                <p-calendar
+                  [(ngModel)]="task.realEndDate"
+                  dateFormat="yy-mm-dd"
+                  showIcon
+                  (click)="$event.stopPropagation()"
+                ></p-calendar>
+                <div class="flex gap-1 mt-1">
+                  <button
+                    pButton
+                    icon="pi pi-check"
+                    class="p-button-sm p-button-success"
+                    (click)="
+                      saveEdit(task, 'realEndDate'); $event.stopPropagation()
+                    "
+                  ></button>
+                  <button
+                    pButton
+                    icon="pi pi-times"
+                    class="p-button-sm p-button-danger"
+                    (click)="
+                      cancelEdit(task.id, 'realEndDate');
+                      $event.stopPropagation()
+                    "
+                  ></button>
+                </div>
+              </ng-container>
+              <ng-template #realDisplay>
+                <i class="pi pi-calendar mr-1 text-gray-400"></i>
+                <span>{{ task.realEndDate }}</span>
+              </ng-template>
+            </td>
 
             <!-- Acciones -->
             <td>
