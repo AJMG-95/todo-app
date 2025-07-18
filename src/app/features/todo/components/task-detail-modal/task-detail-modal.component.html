@@ -1,0 +1,14 @@
+<p-dialog [(visible)]="visible" header="Detalle de Tarea" [modal]="true" [closable]="true" [style]="{width: '400px'}"
+  (onHide)="close()">
+  <div *ngIf="task">
+    <h3>{{ task.title }}</h3>
+    <p>{{ task.description }}</p>
+    <h4>Subtareas</h4>
+    <ul>
+      <li *ngFor="let subtask of subtasks">
+        <p-checkbox [(ngModel)]="subtask.completed" binary="true" (onChange)="toggleSubtask(subtask)"></p-checkbox>
+        {{ subtask.text }}
+      </li>
+    </ul>
+  </div>
+</p-dialog>

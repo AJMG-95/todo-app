@@ -1,0 +1,27 @@
+/* Aplicar estilo personalizado a la opción seleccionada dentro del menú desplegable */
+::ng-deep .p-dropdown-items .p-dropdown-item.p-highlight {
+  background-color: transparent !important;
+  /* eliminamos fondo verde */
+  font-weight: bold;
+  border-left: 4px solid var(--selected-status-color);
+  color: inherit;
+}
+
+
+/* Amarillo para En proceso */
+::ng-deep .p-dropdown-items .p-dropdown-item.p-highlight.estado-2 {
+  border-color: #facc15 !important;
+  /* amarillo */
+}
+
+/* Verde para Completada */
+::ng-deep .p-dropdown-items .p-dropdown-item.p-highlight.estado-3 {
+  border-color: #4ade80 !important;
+  /* verde */
+}
+
+/* Rojo para Cancelada */
+::ng-deep .p-dropdown-items .p-dropdown-item.p-highlight.estado-4 {
+  border-color: #f87171 !important;
+  /* rojo */
+}

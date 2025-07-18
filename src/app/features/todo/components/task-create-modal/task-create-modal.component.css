@@ -1,0 +1,9 @@
+::ng-deep p-calendar .p-inputwrapper {
+  width: 100%;
+}
+
+::ng-deep p-calendar .p-inputtext {
+  width: 100%;
+  text-align: center;
+  /* centra el texto dentro del input */
+}

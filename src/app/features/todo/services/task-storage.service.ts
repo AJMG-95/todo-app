@@ -1,3 +1,4 @@
+// src/app/features/todo/services/task-storage.service.ts
 import { Injectable } from '@angular/core';
 import { Task, Subtask, Status } from '../../../core/models/task.model';
 import { Observable, of } from 'rxjs';
@@ -6,7 +7,14 @@ import { Observable, of } from 'rxjs';
 export class TaskStorageService {
   private readonly TASKS_KEY = 'tasks';
   private readonly SUBTASKS_KEY = 'subtasks';
-  private readonly STATUS_KEY = 'statuses';
+
+  // Estados predefinidos (no se almacenan en localStorage)
+  private readonly STATUSES: Status[] = [
+    { id: 1, nameStatus: 'Pendiente' },
+    { id: 2, nameStatus: 'En proceso' },
+    { id: 3, nameStatus: 'Completada' },
+    { id: 4, nameStatus: 'Cancelada' }
+  ];
 
   // --- TASKS ---
   getTasks(filters?: {
@@ -18,25 +26,21 @@ export class TaskStorageService {
   }): Observable<Task[]> {
     let tasks = this.getFromStorage<Task[]>(this.TASKS_KEY) || [];
 
-    if (filters ) {
+    if (filters) {
       if (filters.title) {
         tasks = tasks.filter(t =>
           t.title.toLowerCase().includes(filters.title!.toLowerCase())
         );
       }
-
       if (filters.category) {
         tasks = tasks.filter(t => t.category === filters.category);
       }
-
       if (filters.createdAt) {
         tasks = tasks.filter(t => t.createdAt.startsWith(filters.createdAt!));
       }
-
       if (filters.startDate) {
         tasks = tasks.filter(t => t.startDate.startsWith(filters.startDate!));
       }
-
       if (typeof filters.statusId === 'number') {
         tasks = tasks.filter(t => t.statusId === filters.statusId);
       }
@@ -44,7 +48,6 @@ export class TaskStorageService {
 
     return of(tasks);
   }
-
 
   getTaskById(id: string): Observable<Task | undefined> {
     const tasks = this.getFromStorage<Task[]>(this.TASKS_KEY) || [];
@@ -57,8 +60,9 @@ export class TaskStorageService {
       existingSubtasks.some(subtask => subtask.id === id)
     );
     if (!allSubtasksExist) {
-      throw new Error('Some subtasks referenced in the task do not exist.');
+      throw new Error('Algunas subtareas no existen.');
     }
+
     const tasks = this.getFromStorage<Task[]>(this.TASKS_KEY) || [];
     tasks.push(task);
     this.saveToStorage(this.TASKS_KEY, tasks);
@@ -70,8 +74,9 @@ export class TaskStorageService {
       existingSubtasks.some(subtask => subtask.id === id)
     );
     if (!allSubtasksExist) {
-      throw new Error('Some subtasks referenced in the task do not exist.');
+      throw new Error('Algunas subtareas no existen.');
     }
+
     let tasks = this.getFromStorage<Task[]>(this.TASKS_KEY) || [];
     tasks = tasks.map(t => (t.id === task.id ? task : t));
     this.saveToStorage(this.TASKS_KEY, tasks);
@@ -82,7 +87,6 @@ export class TaskStorageService {
     tasks = tasks.filter(t => t.id !== id);
     this.saveToStorage(this.TASKS_KEY, tasks);
 
-    // También eliminar subtasks asociadas a esta task
     const subtasks = this.getFromStorage<Subtask[]>(this.SUBTASKS_KEY) || [];
     const updatedSubtasks = subtasks.filter(subtask => {
       return !tasks.some(task => task.subtaskids.includes(subtask.id));
@@ -92,7 +96,7 @@ export class TaskStorageService {
 
   deleteAllTasks(): void {
     localStorage.removeItem(this.TASKS_KEY);
-    localStorage.removeItem(this.SUBTASKS_KEY); // Borra todas las subtasks porque todas están asociadas a una task
+    localStorage.removeItem(this.SUBTASKS_KEY);
   }
 
   deleteAllSubtasksForTask(taskId: string): void {
@@ -121,7 +125,6 @@ export class TaskStorageService {
     return subtasks.find(s => s.id === id);
   }
 
-
   addSubtask(subtask: Subtask, taskId: string): void {
     const subtasks = this.getFromStorage<Subtask[]>(this.SUBTASKS_KEY) || [];
     subtasks.push(subtask);
@@ -148,7 +151,6 @@ export class TaskStorageService {
     subtasks = subtasks.filter(s => s.id !== id);
     this.saveToStorage(this.SUBTASKS_KEY, subtasks);
 
-    // Eliminar la subtask del array subtaskids de todas las tasks
     const tasks = this.getFromStorage<Task[]>(this.TASKS_KEY) || [];
     tasks.forEach(task => {
       task.subtaskids = task.subtaskids.filter(sid => sid !== id);
@@ -158,17 +160,15 @@ export class TaskStorageService {
 
   // --- STATUS ---
   getStatuses(): Observable<Status[]> {
-    const statuses = this.getFromStorage<Status[]>(this.STATUS_KEY) || [];
-    return of(statuses);
+    return of(this.STATUSES);
   }
 
   getStatusById(id: number): Observable<Status | undefined> {
-    const statuses = this.getFromStorage<Status[]>(this.STATUS_KEY) || [];
-    return of(statuses.find(s => s.id === id));
+    return of(this.STATUSES.find(s => s.id === id));
   }
 
   // --- Helpers ---
-  private getFromStorage<T>(key: string): T | null {
+  getFromStorage<T>(key: string): T | null {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   }

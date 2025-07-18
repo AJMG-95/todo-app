@@ -6,7 +6,7 @@ export interface Subtask {
 
 export interface Status {
   id: number;
-  nameStatus: 'pendiente' | 'en_proceso' | 'completada';
+  nameStatus: 'Pendiente' | 'En proceso' | 'Completada' | 'Cancelada';
 }
 
 export interface Task {

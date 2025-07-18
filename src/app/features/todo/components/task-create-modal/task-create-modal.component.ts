@@ -127,12 +127,21 @@ export class TaskCreateModalComponent {
 
   addSubtask(text: string): void {
     if (text.trim()) {
-      const maxId = this.subtasks.length > 0 ? Math.max(...this.subtasks.map(s => s.id)) : 0;
+      const allExistingSubtasks = this.taskService.getFromStorage<Subtask[]>('subtasks') || [];
+      const maxId = allExistingSubtasks.length > 0 ? Math.max(...allExistingSubtasks.map(s => s.id)) : 0;
       const newId = maxId + 1;
-      this.subtasks.push({ id: newId, text: text.trim(), completed: false });
+
+      this.subtasks.push({
+        id: newId,
+        text: text.trim(),
+        completed: false
+      });
+
       this.newSubtaskText = '';
     }
   }
+
+
 
   removeSubtask(subtaskId: number): void {
     this.subtasks = this.subtasks.filter(s => s.id !== subtaskId);
