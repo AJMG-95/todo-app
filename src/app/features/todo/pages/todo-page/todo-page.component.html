@@ -26,6 +26,7 @@
           placeholder="Fecha de creación"
           dateFormat="yy-mm-dd"
           showIcon
+          appendTo="body"
         />
         <p-calendar
           [(ngModel)]="filters.startDate"
@@ -33,6 +34,7 @@
           placeholder="Fecha de inicio"
           dateFormat="yy-mm-dd"
           showIcon
+          appendTo="body"
         />
         <p-dropdown
           [options]="statusOptions"
@@ -260,6 +262,7 @@
                   dateFormat="yy-mm-dd"
                   showIcon
                   (click)="$event.stopPropagation()"
+                  appendTo="body"
                 ></p-calendar>
                 <div class="flex gap-1 mt-1">
                   <button
@@ -303,6 +306,7 @@
                   dateFormat="yy-mm-dd"
                   showIcon
                   (click)="$event.stopPropagation()"
+                  appendTo="body"
                 ></p-calendar>
                 <div class="flex gap-1 mt-1">
                   <button
@@ -345,6 +349,7 @@
                   dateFormat="yy-mm-dd"
                   showIcon
                   (click)="$event.stopPropagation()"
+                  appendTo="body"
                 ></p-calendar>
                 <div class="flex gap-1 mt-1">
                   <button
