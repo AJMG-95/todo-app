@@ -14,7 +14,7 @@ import { TaskCreateModalComponent } from '../../components/task-create-modal/tas
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
 import { TaskStorageService } from '../../services/task-storage.service';
 import Swal from 'sweetalert2';
-
+import { formatDateToLocal } from '../../../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-todo-page',
@@ -62,6 +62,8 @@ export class TodoPageComponent implements OnInit {
   selectedSubtasks: Subtask[] = [];
   showDetailModal: boolean = false;
 
+  private taskBackup: { [taskId: string]: Task } = {};
+
   constructor(private taskService: TaskStorageService) {}
 
   ngOnInit(): void {
@@ -86,10 +88,10 @@ export class TodoPageComponent implements OnInit {
       title: this.filters.title || undefined,
       category: this.filters.category || undefined,
       createdAt: this.filters.createdAt
-        ? this.filters.createdAt.toISOString().split('T')[0]
+        ? formatDateToLocal(this.filters.createdAt)
         : undefined,
       startDate: this.filters.startDate
-        ? this.filters.startDate.toISOString().split('T')[0]
+        ? formatDateToLocal(this.filters.startDate)
         : undefined,
       statusId: this.filters.statusId !== 0 ? this.filters.statusId : undefined, // ← solo filtra si ≠ 0
     };
@@ -117,8 +119,6 @@ export class TodoPageComponent implements OnInit {
   }
 
   deleteTask(taskId: string): void {
-
-
     Swal.fire({
       title: '¿Estás seguro?',
       text: '¡Esta acción eliminará la tarea!',
@@ -127,7 +127,7 @@ export class TodoPageComponent implements OnInit {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.taskService.deleteTask(taskId);
@@ -135,9 +135,6 @@ export class TodoPageComponent implements OnInit {
         Swal.fire('¡Eliminada!', 'La tarea ha sido eliminada.', 'success');
       }
     });
-
-
-
   }
 
   watchTask(task: Task): void {
@@ -156,16 +153,52 @@ export class TodoPageComponent implements OnInit {
 
   startEditing(taskId: string, field: keyof Task): void {
     this.editingField[`${taskId}_${field}`] = field;
+
+    // Solo guardar una vez por campo, si no existe ya
+    if (!this.taskBackup[taskId]) {
+      const original = this.filteredTasks.find((t) => t.id === taskId);
+      if (original) {
+        this.taskBackup[taskId] = JSON.parse(JSON.stringify(original));
+      }
+    }
   }
 
   saveEdit(task: Task, field: keyof Task): void {
     this.taskService.updateTask(task);
     delete this.editingField[`${task.id}_${field}`];
+
+    // Si ya no se edita ningún otro campo, borra backup
+    const stillEditing = Object.keys(this.editingField).some((key) =>
+      key.startsWith(task.id)
+    );
+    if (!stillEditing) {
+      delete this.taskBackup[task.id];
+    }
+
     this.applyFilters();
   }
 
   cancelEdit(taskId: string, field: keyof Task): void {
+    const backup = this.taskBackup[taskId];
+    const task = this.filteredTasks.find((t) => t.id === taskId);
+
+    if (backup && task) {
+      this.restoreField(task, backup, field);
+    }
+
     delete this.editingField[`${taskId}_${field}`];
+
+    // Limpia backup si ya no se está editando ningún campo de esa tarea
+    const stillEditing = Object.keys(this.editingField).some((key) =>
+      key.startsWith(taskId)
+    );
+    if (!stillEditing) {
+      delete this.taskBackup[taskId];
+    }
+  }
+
+  restoreField<T, K extends keyof T>(target: T, source: T, key: K): void {
+    target[key] = source[key];
   }
 
   isEditing(taskId: string, field: keyof Task): boolean {
@@ -211,14 +244,17 @@ export class TodoPageComponent implements OnInit {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar todo',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.taskService.deleteAllTasks();
         this.applyFilters(); // Refrescar lista
-        Swal.fire('¡Eliminado!', 'Todas las tareas han sido eliminadas.', 'success');
+        Swal.fire(
+          '¡Eliminado!',
+          'Todas las tareas han sido eliminadas.',
+          'success'
+        );
       }
     });
   }
-
 }

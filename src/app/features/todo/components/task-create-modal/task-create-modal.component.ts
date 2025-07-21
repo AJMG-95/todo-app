@@ -11,6 +11,7 @@ import { TaskStorageService } from '../../services/task-storage.service';
 import { ChipModule } from 'primeng/chip';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import Swal from 'sweetalert2';
+import { formatDateToLocal } from '../../../../shared/utils/date-utils'
 
 @Component({
   selector: 'task-create-modal',
@@ -123,10 +124,10 @@ export class TaskCreateModalComponent {
       title: formValue.title,
       description: formValue.description,
       category: formValue.category,
-      createdAt: this.taskToEdit?.createdAt ?? this.formatDate(new Date()),
-      startDate: formValue.startDate ? this.formatDate(formValue.startDate) : '',
-      estimatedEndDate: this.formatDate(formValue.estimatedEndDate),
-      realEndDate: formValue.realEndDate ? this.formatDate(formValue.realEndDate) : undefined,
+      createdAt: this.taskToEdit?.createdAt ?? formatDateToLocal(new Date()),
+      startDate: formValue.startDate ? formatDateToLocal(formValue.startDate) : '',
+      estimatedEndDate: formatDateToLocal(formValue.estimatedEndDate),
+      realEndDate: formValue.realEndDate ? formatDateToLocal(formValue.realEndDate) : undefined,
       statusId: formValue.statusId,
       tags: formValue.tags ? formValue.tags.split(',').map((t: string) => t.trim()) : [],
       subtaskids: this.subtasks.map(s => s.id)
@@ -138,14 +139,7 @@ export class TaskCreateModalComponent {
       if (existing) {
         this.taskService.updateSubtask(sub);
       } else {
-        this.subtasks.forEach(sub => {
-          const existing = this.taskService.getSubtaskById(sub.id);
-          if (existing) {
-            this.taskService.updateSubtask(sub);
-          } else {
-            this.taskService.addSubtask(sub, taskId);
-          }
-        });
+        this.taskService.addSubtask(sub, taskId); // ✅ solo se añade una vez correctamente
       }
     });
 
@@ -163,6 +157,7 @@ export class TaskCreateModalComponent {
     this.initialSubtasksJson = JSON.stringify(this.subtasks);
     this.forceClose();
   }
+
 
   addSubtask(text: string): void {
     if (text.trim()) {
@@ -231,7 +226,6 @@ export class TaskCreateModalComponent {
           this.subtasksToDelete = [];
           this.deletedSubtasksBackup = [];
         } else {
-          // Si se canceló desde el cierre automático del modal
           this.visible = true;
         }
       });
@@ -265,10 +259,6 @@ export class TaskCreateModalComponent {
 
   private subtasksModified(): boolean {
     return JSON.stringify(this.subtasks) !== this.initialSubtasksJson;
-  }
-
-  private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
   }
 
 }

@@ -77,6 +77,11 @@
       <!-- Fechas -->
       <div class="flex gap-4 w-full">
         <section class="w-full">
+            <p-floatlabel variant="on">
+              <p-calendar formControlName="startDate" id="startDate" [showIcon]="true" dateFormat="yy-mm-dd" appendTo="body"
+                class="w-full"></p-calendar>
+              <label for="startDate">Fecha de inicio</label>
+            </p-floatlabel>
           <p-floatlabel variant="on">
             <p-calendar
               formControlName="estimatedEndDate"
