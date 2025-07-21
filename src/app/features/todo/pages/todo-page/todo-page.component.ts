@@ -11,6 +11,8 @@ import { Status, Subtask, Task } from '../../../../core/models/task.model';
 import { TaskCreateModalComponent } from '../../components/task-create-modal/task-create-modal.component';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
 import { TaskStorageService } from '../../services/task-storage.service';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-todo-page',
@@ -113,10 +115,27 @@ export class TodoPageComponent implements OnInit {
   }
 
   deleteTask(taskId: string): void {
-    if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
-      this.taskService.deleteTask(taskId);
-      this.applyFilters();
-    }
+
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡Esta acción eliminará la tarea!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.taskService.deleteTask(taskId);
+        this.applyFilters();
+        Swal.fire('¡Eliminada!', 'La tarea ha sido eliminada.', 'success');
+      }
+    });
+
+
+
   }
 
   watchTask(task: Task): void {
@@ -180,4 +199,24 @@ export class TodoPageComponent implements OnInit {
     this.showDetailModal = false;
     this.selectedTask = null;
   }
+
+  confirmDeleteAll(): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡Esta acción eliminará todas las tareas y subtareas!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar todo',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.taskService.deleteAllTasks();
+        this.applyFilters(); // Refrescar lista
+        Swal.fire('¡Eliminado!', 'Todas las tareas han sido eliminadas.', 'success');
+      }
+    });
+  }
+
 }

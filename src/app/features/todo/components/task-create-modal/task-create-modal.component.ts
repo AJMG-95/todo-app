@@ -9,6 +9,8 @@ import { ButtonModule } from 'primeng/button';
 import { Task, Subtask } from '../../../../core/models/task.model';
 import { TaskStorageService } from '../../services/task-storage.service';
 import { ChipModule } from 'primeng/chip';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'task-create-modal',
@@ -21,7 +23,8 @@ import { ChipModule } from 'primeng/chip';
     InputTextModule,
     CalendarModule,
     ButtonModule,
-    ChipModule
+    ChipModule,
+    FloatLabelModule
   ],
   templateUrl: './task-create-modal.component.html',
   styleUrl: './task-create-modal.component.css'
@@ -39,6 +42,8 @@ export class TaskCreateModalComponent {
   subtasks: Subtask[] = [];
   newSubtaskText: string = '';
   formSubmitted = false;
+
+  private initialSubtasksJson: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -59,7 +64,7 @@ export class TaskCreateModalComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['taskToEdit']) {
       if (this.taskToEdit) {
-        // Modo edición: rellenar el formulario
+        // Modo edición
         this.taskForm.patchValue({
           title: this.taskToEdit.title,
           description: this.taskToEdit.description,
@@ -77,7 +82,7 @@ export class TaskCreateModalComponent {
 
         this.showSubtaskSection = true;
       } else {
-        // Modo crear: resetear todo
+        // Modo crear
         this.taskForm.reset({
           title: '',
           description: '',
@@ -94,9 +99,11 @@ export class TaskCreateModalComponent {
         this.showSubtaskSection = false;
         this.newSubtaskText = '';
       }
+
+      this.taskForm.markAsPristine();
+      this.initialSubtasksJson = JSON.stringify(this.subtasks);
     }
   }
-
 
   onSubmit(): void {
     this.formSubmitted = true;
@@ -123,7 +130,7 @@ export class TaskCreateModalComponent {
       subtaskids: this.subtasks.map(s => s.id)
     };
 
-    // Guardar o actualizar subtareas antes de guardar la tarea
+    // Guardar o actualizar subtareas
     this.subtasks.forEach(sub => {
       const existing = this.taskService.getSubtaskById(sub.id);
       if (existing) {
@@ -141,10 +148,10 @@ export class TaskCreateModalComponent {
       this.taskCreated.emit(task);
     }
 
-    this.close();
+    this.taskForm.markAsPristine();
+    this.initialSubtasksJson = JSON.stringify(this.subtasks);
+    this.forceClose();
   }
-
-
 
   addSubtask(text: string): void {
     if (text.trim()) {
@@ -162,8 +169,6 @@ export class TaskCreateModalComponent {
     }
   }
 
-
-
   removeSubtask(subtaskId: number): void {
     this.subtasks = this.subtasks.filter(s => s.id !== subtaskId);
   }
@@ -174,17 +179,53 @@ export class TaskCreateModalComponent {
     }
   }
 
-  close(): void {
+  handleClose(): void {
+    const hasUnsavedChanges =
+      this.taskForm.dirty || this.subtasksModified();
+
+    if (hasUnsavedChanges) {
+      Swal.fire({
+        title: '¿Descartar cambios?',
+        text: 'Has realizado cambios que se perderán si cierras el formulario.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, descartar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.forceClose();
+        } else {
+          // Si se canceló desde el cierre automático del modal
+          this.visible = true;
+        }
+      });
+    } else {
+      this.forceClose();
+    }
+  }
+
+
+  private forceClose(): void {
     this.visibleChange.emit(false);
     this.taskForm.reset();
     this.subtasks = [];
     this.formSubmitted = false;
     this.showSubtaskSection = false;
     this.newSubtaskText = '';
-    this.taskToEdit = null
+    this.taskToEdit = null;
+    this.initialSubtasksJson = '';
+  }
+
+  private subtasksModified(): boolean {
+    return JSON.stringify(this.subtasks) !== this.initialSubtasksJson;
   }
 
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
+
+
+
 }

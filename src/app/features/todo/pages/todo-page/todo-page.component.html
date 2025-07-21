@@ -49,15 +49,15 @@
     </section>
   </p-card>
 
+  <div class="flex justify-end w-full gap-2">
   <!-- Botón Crear Tarea -->
-   <div class="flex justify-end w-full ">
-     <p-button
-       label="Crear Tarea"
-       icon="pi pi-plus"
-       class="mb-4"
-       (onClick)="showCreateModal = true"
-     ></p-button>
-   </div>
+  <p-button label="Crear Tarea" icon="pi pi-plus" [raised]="true" (onClick)="showCreateModal = true"></p-button>
+
+  <!-- Botón borrar Tareas -->
+  <p-button label="Eliminar Todas" severity="danger"  icon="pi pi-trash" [raised]="true"
+    (onClick)="confirmDeleteAll()"></p-button>
+</div>
+
 
   <!-- Tabla de Tareas -->
   <p-card>

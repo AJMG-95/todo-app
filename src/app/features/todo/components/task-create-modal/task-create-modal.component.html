@@ -1,29 +1,108 @@
-<p-dialog [(visible)]="visible" [modal]="true" [closable]="true" (onHide)="close()"
-  [style]="{ width: '90vw', maxWidth: '700px' }" [header]="taskToEdit ? 'Editar Tarea ✏️' : 'Crear Nueva Tarea'">
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  (onHide)="handleClose()"
+  [style]="{ width: '90vw', maxWidth: '700px' }"
+  [header]="taskToEdit ? 'Editar Tarea ✏️' : 'Crear Nueva Tarea'"
+>
   <div class="flex flex-col justify-between h-full">
     <!-- FORMULARIO PRINCIPAL -->
-    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 overflow-y-auto pr-1"
-      style="max-height: 75vh">
-      <input pInputText formControlName="title" placeholder="Título" class="w-full" />
-      <small *ngIf="formSubmitted && taskForm.controls['title'].invalid" class="text-red-500">
-        El título es obligatorio.
-      </small>
+    <form
+      *ngIf="visible"
+      [formGroup]="taskForm"
+      (ngSubmit)="onSubmit()"
+      class="flex flex-col gap-4 overflow-y-auto pr-1 max-h-[75vh] p-4"
+    >
+      <section>
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            formControlName="title"
+            class="w-full formSubmitted && taskForm.controls['title'].invalid ? border red"
+            id="title"
+            [ngClass]="{
+              'border border-red-500':
+                formSubmitted && taskForm.controls['title'].invalid
+            }"
+          />
+          <label for="title">Titulo</label>
+        </p-floatlabel>
+        <small
+          *ngIf="formSubmitted && taskForm.controls['title'].invalid"
+          class="text-red-500"
+        >
+          El título es obligatorio.
+        </small>
+      </section>
 
-      <input pInputText formControlName="description" placeholder="Descripción" class="w-full" />
-      <small *ngIf="formSubmitted && taskForm.controls['description'].invalid" class="text-red-500">
-        La descripción es obligatoria.
-      </small>
+      <section>
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            formControlName="description"
+            class="w-full"
+            id="description"
+          />
+          <label for="description">Descripción</label>
+        </p-floatlabel>
+        <small
+          *ngIf="formSubmitted && taskForm.controls['description'].invalid"
+          class="text-red-500"
+        >
+          La descripción es obligatoria.
+        </small>
+      </section>
 
-      <input pInputText formControlName="category" placeholder="Categoría" class="w-full" />
-      <input pInputText formControlName="tags" placeholder="Etiquetas (coma separadas)" class="w-full" />
+      <section>
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            formControlName="category"
+            id="category"
+            class="w-full"
+          />
+          <label for="category">Categoría</label>
+        </p-floatlabel>
+      </section>
+
+      <section>
+        <p-floatlabel variant="on">
+          <input pInputText formControlName="tags" id="tags" class="w-full" />
+
+          <label for="">Etiquetas (coma separadas)</label>
+        </p-floatlabel>
+      </section>
 
       <!-- Fechas -->
       <div class="flex gap-4 w-full">
-        <p-calendar formControlName="estimatedEndDate" [showIcon]="true" dateFormat="yy-mm-dd"
-          placeholder="Fecha estimada" appendTo="body" class="w-full"></p-calendar>
+        <section class="w-full">
+          <p-floatlabel variant="on">
+            <p-calendar
+              formControlName="estimatedEndDate"
+              id="estimatedEndDate"
+              [showIcon]="true"
+              dateFormat="yy-mm-dd"
+              appendTo="body"
+              class="w-full"
+            ></p-calendar>
+            <label for="estimatedEndDate">Fecha estimada</label>
+          </p-floatlabel>
+        </section>
 
-        <p-calendar *ngIf="taskToEdit" formControlName="realEndDate" [showIcon]="true" dateFormat="yy-mm-dd"
-          placeholder="Fecha real" appendTo="body" class="w-full"></p-calendar>
+        <section [hidden]="!taskToEdit" class="w-full">
+          <p-floatlabel variant="on">
+            <p-calendar
+              formControlName="realEndDate"
+              id="realEndDate"
+              [showIcon]="true"
+              dateFormat="yy-mm-dd"
+              appendTo="body"
+              class="w-full"
+            />
+            <label for="realEndDate">Fecha real</label>
+          </p-floatlabel>
+        </section>
       </div>
 
       <!-- Subtareas -->
@@ -31,20 +110,48 @@
         <h3 class="text-md font-semibold mb-2">Subtareas</h3>
 
         <div class="flex flex-col sm:flex-row gap-2 mb-2">
-          <input pInputText placeholder="Nueva subtarea" [(ngModel)]="newSubtaskText"
-            [ngModelOptions]="{ standalone: true }" name="newSubtaskText" class="flex-1" />
+          <input
+            pInputText
+            placeholder="Nueva subtarea"
+            [(ngModel)]="newSubtaskText"
+            [ngModelOptions]="{ standalone: true }"
+            name="newSubtaskText"
+            class="flex-1"
+          />
           <!-- ✅ tipo button evita submit -->
-          <button type="button" pButton icon="pi pi-plus" class="p-button-sm" label="Añadir"
-            (click)="addSubtask(newSubtaskText)" [disabled]="!newSubtaskText?.trim()"></button>
+          <button
+            type="button"
+            pButton
+            icon="pi pi-plus"
+            class="p-button-sm"
+            label="Añadir"
+            (click)="addSubtask(newSubtaskText)"
+            [disabled]="!newSubtaskText?.trim()"
+          ></button>
         </div>
 
-        <div class="h-40 overflow-y-auto border border-gray-300 rounded p-2 bg-blue-50 shadow-inner">
+        <div
+          class="h-40 overflow-y-auto border border-gray-300 rounded p-2 bg-blue-50 shadow-inner"
+        >
           <ul class="list-disc pl-4 pr-2">
-            <li *ngFor="let subtask of subtasks" class="mb-2 flex items-center gap-2">
-              <input pInputText [(ngModel)]="subtask.text" [ngModelOptions]="{ standalone: true }" class="w-full"
-                name="subtask-{{ subtask.id }}" />
-              <button type="button" pButton icon="pi pi-trash" class="p-button-text p-button-sm text-red-500"
-                (click)="removeSubtask(subtask.id)"></button>
+            <li
+              *ngFor="let subtask of subtasks"
+              class="mb-2 flex items-center gap-2"
+            >
+              <input
+                pInputText
+                [(ngModel)]="subtask.text"
+                [ngModelOptions]="{ standalone: true }"
+                class="w-full"
+                name="subtask-{{ subtask.id }}"
+              />
+              <button
+                type="button"
+                pButton
+                icon="pi pi-trash"
+                class="p-button-text p-button-sm text-red-500"
+                (click)="removeSubtask(subtask.id)"
+              ></button>
             </li>
           </ul>
         </div>
@@ -53,8 +160,19 @@
 
     <!-- ✅ BOTONES FINALES FUERA DEL FORMULARIO -->
     <div class="flex justify-end gap-2 pt-4 border-t mt-4">
-      <button type="button" pButton label="Cancelar" class="p-button-secondary" (click)="close()"></button>
-      <button type="submit" pButton [label]="taskToEdit ? 'Actualizar' : 'Crear'" (click)="onSubmit()"></button>
+      <button
+        type="button"
+        pButton
+        label="Cancelar"
+        class="p-button-secondary"
+        (click)="handleClose()"
+      ></button>
+      <button
+        type="submit"
+        pButton
+        [label]="taskToEdit ? 'Actualizar' : 'Crear'"
+        (click)="onSubmit()"
+      ></button>
     </div>
   </div>
 </p-dialog>
