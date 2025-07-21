@@ -1,16 +1,16 @@
+import { NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { DropdownModule } from 'primeng/dropdown';
-import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
+import { TableModule } from 'primeng/table';
 import { Status, Subtask, Task } from '../../../../core/models/task.model';
 import { TaskCreateModalComponent } from '../../components/task-create-modal/task-create-modal.component';
-import { TaskStorageService } from '../../services/task-storage.service';
 import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
-import { NgClass, NgIf } from '@angular/common';
+import { TaskStorageService } from '../../services/task-storage.service';
 
 @Component({
   selector: 'app-todo-page',
@@ -26,10 +26,10 @@ import { NgClass, NgIf } from '@angular/common';
     ButtonModule,
     InputTextModule,
     TaskCreateModalComponent,
-    TaskDetailModalComponent
+    TaskDetailModalComponent,
   ],
   templateUrl: './todo-page.component.html',
-  styleUrl: './todo-page.component.css'
+  styleUrl: './todo-page.component.css',
 })
 export class TodoPageComponent implements OnInit {
   tasks: Task[] = [];
@@ -46,11 +46,11 @@ export class TodoPageComponent implements OnInit {
     startDate?: Date | null;
     statusId?: number;
   } = {
-      title: undefined,
-      category: undefined,
-      createdAt: null,
-      startDate: null,
-      statusId: 0
+    title: undefined,
+    category: undefined,
+    createdAt: null,
+    startDate: null,
+    statusId: 0,
   };
 
   showCreateModal: boolean = false;
@@ -58,7 +58,7 @@ export class TodoPageComponent implements OnInit {
   selectedSubtasks: Subtask[] = [];
   showDetailModal: boolean = false;
 
-  constructor(private taskService: TaskStorageService) { }
+  constructor(private taskService: TaskStorageService) {}
 
   ngOnInit(): void {
     this.loadStatuses();
@@ -66,18 +66,16 @@ export class TodoPageComponent implements OnInit {
   }
 
   loadStatuses(): void {
-    this.taskService.getStatuses().subscribe(statuses => {
+    this.taskService.getStatuses().subscribe((statuses) => {
       this.statuses = statuses;
 
       // Opciones para el filtro (sí incluye "Todos")
       this.statusOptions = [
         { label: 'Todos', value: 0 },
-        ...statuses.map(s => ({ label: s.nameStatus, value: s.id }))
+        ...statuses.map((s) => ({ label: s.nameStatus, value: s.id })),
       ];
     });
   }
-
-
 
   applyFilters(): void {
     const filterParams = {
@@ -89,17 +87,16 @@ export class TodoPageComponent implements OnInit {
       startDate: this.filters.startDate
         ? this.filters.startDate.toISOString().split('T')[0]
         : undefined,
-      statusId: this.filters.statusId !== 0 ? this.filters.statusId : undefined // ← solo filtra si ≠ 0
+      statusId: this.filters.statusId !== 0 ? this.filters.statusId : undefined, // ← solo filtra si ≠ 0
     };
 
-    this.taskService.getTasks(filterParams).subscribe(tasks => {
+    this.taskService.getTasks(filterParams).subscribe((tasks) => {
       this.filteredTasks = tasks;
     });
   }
 
-
   getStatusLabel(statusId: number): string {
-    const status = this.statuses.find(s => s.id === statusId);
+    const status = this.statuses.find((s) => s.id === statusId);
     return status ? status.nameStatus : 'Desconocido';
   }
 
@@ -124,8 +121,10 @@ export class TodoPageComponent implements OnInit {
 
   watchTask(task: Task): void {
     this.selectedTask = task;
-    this.taskService.getSubtasks().subscribe(subtasks => {
-      this.selectedSubtasks = subtasks.filter(s => task.subtaskids.includes(s.id));
+    this.taskService.getSubtasks().subscribe((subtasks) => {
+      this.selectedSubtasks = subtasks.filter((s) =>
+        task.subtaskids.includes(s.id)
+      );
       this.showDetailModal = true;
     });
   }
@@ -143,7 +142,6 @@ export class TodoPageComponent implements OnInit {
     delete this.editingField[`${task.id}_${field}`];
     this.applyFilters();
   }
-
 
   cancelEdit(taskId: string, field: keyof Task): void {
     delete this.editingField[`${taskId}_${field}`];
@@ -165,9 +163,21 @@ export class TodoPageComponent implements OnInit {
   }
 
   get editableStatusOptions() {
-    return this.statusOptions.filter(s => s.value !== 0);
+    return this.statusOptions.filter((s) => s.value !== 0);
   }
 
+  editTask(task: Task): void {
+    this.selectedTask = { ...task };
+    this.showCreateModal = true;
+  }
 
+  onCreateModalClosed(): void {
+    this.showCreateModal = false;
+    this.selectedTask = null;
+  }
 
+  onDetailModalClosed(): void {
+    this.showDetailModal = false;
+    this.selectedTask = null;
+  }
 }

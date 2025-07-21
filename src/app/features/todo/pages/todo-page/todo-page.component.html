@@ -50,12 +50,14 @@
   </p-card>
 
   <!-- Botón Crear Tarea -->
-  <p-button
-    label="Crear Tarea"
-    icon="pi pi-plus"
-    class="mb-4"
-    (onClick)="showCreateModal = true"
-  ></p-button>
+   <div class="flex justify-end w-full ">
+     <p-button
+       label="Crear Tarea"
+       icon="pi pi-plus"
+       class="mb-4"
+       (onClick)="showCreateModal = true"
+     ></p-button>
+   </div>
 
   <!-- Tabla de Tareas -->
   <p-card>
@@ -384,6 +386,13 @@
                 icon="pi pi-eye"
                 class="p-button-sm p-button-text"
                 (click)="watchTask(task)"
+                clas
+              ></button>
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-sm p-button-text text-blue-500"
+                (click)="editTask(task)"
               ></button>
               <button
                 pButton
@@ -402,10 +411,15 @@
   <task-create-modal
     [(visible)]="showCreateModal"
     [taskToEdit]="selectedTask"
+    (visibleChange)="onCreateModalClosed()"
     (taskCreated)="onTaskCreated()"
     (taskUpdated)="onTaskUpdated()"
   />
 
   <!-- Modal Detalle -->
-  <task-detail-modal [(visible)]="showDetailModal" [task]="selectedTask!" />
+  <task-detail-modal
+    [(visible)]="showDetailModal"
+    [task]="selectedTask!"
+    (visibleChange)="onDetailModalClosed()"
+  />
 </div>

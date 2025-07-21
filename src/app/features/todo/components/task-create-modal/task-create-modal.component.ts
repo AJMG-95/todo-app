@@ -57,25 +57,46 @@ export class TaskCreateModalComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['taskToEdit'] && this.taskToEdit) {
-      this.taskForm.patchValue({
-        title: this.taskToEdit.title,
-        description: this.taskToEdit.description,
-        category: this.taskToEdit.category,
-        startDate: this.taskToEdit.startDate ? new Date(this.taskToEdit.startDate) : null,
-        estimatedEndDate: new Date(this.taskToEdit.estimatedEndDate),
-        realEndDate: this.taskToEdit.realEndDate ? new Date(this.taskToEdit.realEndDate) : null,
-        tags: this.taskToEdit.tags?.join(', '),
-        statusId: this.taskToEdit.statusId
-      });
+    if (changes['taskToEdit']) {
+      if (this.taskToEdit) {
+        // Modo edición: rellenar el formulario
+        this.taskForm.patchValue({
+          title: this.taskToEdit.title,
+          description: this.taskToEdit.description,
+          category: this.taskToEdit.category,
+          startDate: this.taskToEdit.startDate ? new Date(this.taskToEdit.startDate) : null,
+          estimatedEndDate: new Date(this.taskToEdit.estimatedEndDate),
+          realEndDate: this.taskToEdit.realEndDate ? new Date(this.taskToEdit.realEndDate) : null,
+          tags: this.taskToEdit.tags?.join(', '),
+          statusId: this.taskToEdit.statusId
+        });
 
-      this.subtasks = this.taskToEdit.subtaskids
-        .map(id => this.taskService.getSubtaskById(id))
-        .filter((sub): sub is Subtask => !!sub);
+        this.subtasks = this.taskToEdit.subtaskids
+          .map(id => this.taskService.getSubtaskById(id))
+          .filter((sub): sub is Subtask => !!sub);
 
-      this.showSubtaskSection = true;
+        this.showSubtaskSection = true;
+      } else {
+        // Modo crear: resetear todo
+        this.taskForm.reset({
+          title: '',
+          description: '',
+          category: '',
+          startDate: null,
+          estimatedEndDate: null,
+          realEndDate: null,
+          tags: '',
+          statusId: 1
+        });
+
+        this.subtasks = [];
+        this.formSubmitted = false;
+        this.showSubtaskSection = false;
+        this.newSubtaskText = '';
+      }
     }
   }
+
 
   onSubmit(): void {
     this.formSubmitted = true;
@@ -160,6 +181,7 @@ export class TaskCreateModalComponent {
     this.formSubmitted = false;
     this.showSubtaskSection = false;
     this.newSubtaskText = '';
+    this.taskToEdit = null
   }
 
   private formatDate(date: Date): string {
