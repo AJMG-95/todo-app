@@ -179,11 +179,22 @@ export class TaskCreateModalComponent {
     }
   }
 
+
   handleClose(): void {
+    const isEditing = this.taskToEdit !== null;
+
+    const formIsEmpty = !isEditing && Object.entries(this.taskForm.value).every(([key, value]) => {
+      // Consideramos campos "vacíos" si son null, undefined, string vacía, o arrays vacíos
+      return value === null || value === '' || (Array.isArray(value) && value.length === 0);
+    });
+
+
     const hasUnsavedChanges =
       this.taskForm.dirty || this.subtasksModified();
 
-    if (hasUnsavedChanges) {
+    if (!isEditing && formIsEmpty) {
+      this.forceClose();
+    } else  if  (hasUnsavedChanges) {
       Swal.fire({
         title: '¿Descartar cambios?',
         text: 'Has realizado cambios que se perderán si cierras el formulario.',
