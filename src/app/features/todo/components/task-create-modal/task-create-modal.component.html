@@ -75,13 +75,22 @@
       </section>
 
       <!-- Fechas -->
-      <div class="flex gap-4 w-full">
-        <section class="w-full">
-            <p-floatlabel variant="on">
-              <p-calendar formControlName="startDate" id="startDate" [showIcon]="true" dateFormat="yy-mm-dd" appendTo="body"
-                class="w-full"></p-calendar>
-              <label for="startDate">Fecha de inicio</label>
-            </p-floatlabel>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+        <section >
+          <p-floatlabel variant="on">
+            <p-calendar
+              formControlName="startDate"
+              id="startDate"
+              [showIcon]="true"
+              dateFormat="yy-mm-dd"
+              appendTo="body"
+              class="w-full"
+            ></p-calendar>
+            <label for="startDate">Fecha de inicio</label>
+          </p-floatlabel>
+        </section>
+
+        <section>
           <p-floatlabel variant="on">
             <p-calendar
               formControlName="estimatedEndDate"
@@ -95,7 +104,7 @@
           </p-floatlabel>
         </section>
 
-        <section [hidden]="!taskToEdit" class="w-full">
+        <section *ngIf="taskToEdit">
           <p-floatlabel variant="on">
             <p-calendar
               formControlName="realEndDate"
@@ -104,7 +113,7 @@
               dateFormat="yy-mm-dd"
               appendTo="body"
               class="w-full"
-            />
+            ></p-calendar>
             <label for="realEndDate">Fecha real</label>
           </p-floatlabel>
         </section>
@@ -142,7 +151,7 @@
             type="button"
             pButton
             icon="pi pi-plus"
-            class="p-button-sm  min-w-[128px]"
+            class="p-button-sm min-w-[128px]"
             label="Añadir"
             (click)="addSubtask(newSubtaskText)"
             [disabled]="!newSubtaskText?.trim()"
