@@ -1,3 +1,4 @@
+<!-- src\app\features\todo\components\task-detail-modal\task-detail-modal.component.html -->
 <p-dialog [(visible)]="visible" header="📝 Detalle de la Tarea" [modal]="true" [closable]="true" (onHide)="close()"
   [style]="{ width: '90vw', maxWidth: '500px', height: 'auto' }">
   <div *ngIf="task" class="flex flex-col gap-4">
@@ -14,7 +15,9 @@
       <div class="max-h-60 overflow-y-auto border border-gray-200 rounded p-3 bg-gray-50 shadow-inner">
         <ul class="space-y-2">
           <li *ngFor="let subtask of subtasks" class="flex items-center gap-3">
-            <p-checkbox [(ngModel)]="subtask.completed" binary="true" (onChange)="toggleSubtask(subtask)"></p-checkbox>
+        <p-checkbox [binary]="true" [ngModel]="subtask.completed" (ngModelChange)="onToggleSubtask(subtask, $event)">
+        </p-checkbox>
+
             <span [ngClass]="{ 'line-through text-gray-400': subtask.completed, 'text-gray-800': !subtask.completed }"
               class="text-base">
               {{ subtask.text }}

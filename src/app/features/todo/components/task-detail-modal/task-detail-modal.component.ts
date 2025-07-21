@@ -1,3 +1,4 @@
+// src\app\features\todo\components\task-detail-modal\task-detail-modal.component.ts
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -36,10 +37,9 @@ export class TaskDetailModalComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['task'] && this.task) {
-      this.loadSubtasks();
+      setTimeout(() => this.loadSubtasks(), 0); // asegura ejecución después de render
     }
   }
-
   loadSubtasks(): void {
     this.taskService.getSubtasks().subscribe(allSubtasks => {
       this.subtasks = allSubtasks.filter(sub => this.task.subtaskids.includes(sub.id));
@@ -50,8 +50,21 @@ export class TaskDetailModalComponent implements OnInit, OnChanges {
     this.visibleChange.emit(false);
   }
 
-  toggleSubtask(subtask: Subtask): void {
-    subtask.completed = !subtask.completed;
-    this.taskService.updateSubtask(subtask);
+  onToggleSubtask(subtask: Subtask, completed: boolean): void {
+    const updatedSubtask: Subtask = {
+      ...subtask,
+      completed
+    };
+    this.taskService.updateSubtask(updatedSubtask);
+
+    const index = this.subtasks.findIndex(s => s.id === subtask.id);
+    if (index !== -1) {
+      this.subtasks[index] = updatedSubtask;
+    }
   }
+
+
+
+
+
 }

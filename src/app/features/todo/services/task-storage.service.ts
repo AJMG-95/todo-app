@@ -127,17 +127,14 @@ export class TaskStorageService {
 
   addSubtask(subtask: Subtask, taskId: string): void {
     const subtasks = this.getFromStorage<Subtask[]>(this.SUBTASKS_KEY) || [];
-    subtasks.push(subtask);
-    this.saveToStorage(this.SUBTASKS_KEY, subtasks);
 
-    const tasks = this.getFromStorage<Task[]>(this.TASKS_KEY) || [];
-    const taskIndex = tasks.findIndex(t => t.id === taskId);
-    if (taskIndex !== -1) {
-      if (!tasks[taskIndex].subtaskids.includes(subtask.id)) {
-        tasks[taskIndex].subtaskids.push(subtask.id);
-        this.saveToStorage(this.TASKS_KEY, tasks);
-      }
+    // Añadir solo si no existe ya
+    const alreadyExists = subtasks.some(s => s.id === subtask.id);
+    if (!alreadyExists) {
+      subtasks.push(subtask);
+      this.saveToStorage(this.SUBTASKS_KEY, subtasks);
     }
+
   }
 
   updateSubtask(subtask: Subtask): void {

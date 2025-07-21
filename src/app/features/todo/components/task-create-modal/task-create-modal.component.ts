@@ -42,6 +42,8 @@ export class TaskCreateModalComponent {
   subtasks: Subtask[] = [];
   newSubtaskText: string = '';
   formSubmitted = false;
+  subtasksToDelete: number[] = [];
+  deletedSubtasksBackup: Subtask[] = [];
 
   private initialSubtasksJson: string = '';
 
@@ -136,11 +138,20 @@ export class TaskCreateModalComponent {
       if (existing) {
         this.taskService.updateSubtask(sub);
       } else {
-        this.taskService.addSubtask(sub, taskId);
+        this.subtasks.forEach(sub => {
+          const existing = this.taskService.getSubtaskById(sub.id);
+          if (existing) {
+            this.taskService.updateSubtask(sub);
+          } else {
+            this.taskService.addSubtask(sub, taskId);
+          }
+        });
       }
     });
 
     if (this.taskToEdit) {
+      this.subtasksToDelete.forEach(id => this.taskService.deleteSubtask(id));
+      this.subtasksToDelete = [];
       this.taskService.updateTask(task);
       this.taskUpdated.emit(task);
     } else {
@@ -156,8 +167,13 @@ export class TaskCreateModalComponent {
   addSubtask(text: string): void {
     if (text.trim()) {
       const allExistingSubtasks = this.taskService.getFromStorage<Subtask[]>('subtasks') || [];
-      const maxId = allExistingSubtasks.length > 0 ? Math.max(...allExistingSubtasks.map(s => s.id)) : 0;
-      const newId = maxId + 1;
+
+      // Generar un ID único que no se repita
+      const existingIds = new Set(allExistingSubtasks.map(s => s.id).concat(this.subtasks.map(s => s.id)));
+      let newId = 1;
+      while (existingIds.has(newId)) {
+        newId++;
+      }
 
       this.subtasks.push({
         id: newId,
@@ -170,6 +186,11 @@ export class TaskCreateModalComponent {
   }
 
   removeSubtask(subtaskId: number): void {
+    const removed = this.subtasks.find(s => s.id === subtaskId);
+    if (removed) {
+      this.deletedSubtasksBackup.push(removed);
+    }
+    this.subtasksToDelete.push(subtaskId);
     this.subtasks = this.subtasks.filter(s => s.id !== subtaskId);
   }
 
@@ -207,6 +228,8 @@ export class TaskCreateModalComponent {
       }).then((result) => {
         if (result.isConfirmed) {
           this.forceClose();
+          this.subtasksToDelete = [];
+          this.deletedSubtasksBackup = [];
         } else {
           // Si se canceló desde el cierre automático del modal
           this.visible = true;
@@ -214,6 +237,17 @@ export class TaskCreateModalComponent {
       });
     } else {
       this.forceClose();
+    }
+  }
+
+
+  undoLastSubtaskRemoval(): void {
+    if (this.deletedSubtasksBackup.length > 0) {
+      const restored = this.deletedSubtasksBackup.pop();
+      if (restored) {
+        this.subtasks.push(restored);
+        this.subtasksToDelete = this.subtasksToDelete.filter(id => id !== restored.id);
+      }
     }
   }
 
@@ -236,7 +270,5 @@ export class TaskCreateModalComponent {
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
-
-
 
 }

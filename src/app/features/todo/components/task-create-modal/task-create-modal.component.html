@@ -110,20 +110,34 @@
         <h3 class="text-md font-semibold mb-2">Subtareas</h3>
 
         <div class="flex flex-col sm:flex-row gap-2 mb-2">
-          <input
-            pInputText
-            placeholder="Nueva subtarea"
-            [(ngModel)]="newSubtaskText"
-            [ngModelOptions]="{ standalone: true }"
-            name="newSubtaskText"
-            class="flex-1"
-          />
-          <!-- ✅ tipo button evita submit -->
+          <section [hidden]="!taskToEdit" class="w-full">
+            <p-floatlabel variant="on">
+              <input
+                pInputText
+                [(ngModel)]="newSubtaskText"
+                [ngModelOptions]="{ standalone: true }"
+                name="newSubtaskText"
+                id="newSubtaskText"
+                class="flex-1 w-full"
+              />
+              <label for="newSubtaskText">Nueva subtarea</label>
+            </p-floatlabel>
+          </section>
+
+          <button
+            *ngIf="deletedSubtasksBackup.length !== 0"
+            type="button"
+            pButton
+            icon="pi pi-undo"
+            class="p-button-sm p-button-secondary"
+            (click)="undoLastSubtaskRemoval()"
+          ></button>
+
           <button
             type="button"
             pButton
             icon="pi pi-plus"
-            class="p-button-sm"
+            class="p-button-sm  min-w-[128px]"
             label="Añadir"
             (click)="addSubtask(newSubtaskText)"
             [disabled]="!newSubtaskText?.trim()"
