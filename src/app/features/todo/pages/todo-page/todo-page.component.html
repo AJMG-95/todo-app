@@ -3,61 +3,31 @@
 <div class="flex flex-col justify-center gap-12 w-full">
   <!-- Filtros -->
   <p-card>
-    <section class="p-4">
-      <h2 class="text-xl font-semibold mb-4">Filtrar Tareas</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <input
-          type="text"
-          pInputText
-          placeholder="Título"
-          [(ngModel)]="filters.title"
-          (ngModelChange)="applyFilters()"
-        />
-        <input
-          type="text"
-          pInputText
-          placeholder="Categoría"
-          [(ngModel)]="filters.category"
-          (ngModelChange)="applyFilters()"
-        />
-        <p-calendar
-          [(ngModel)]="filters.createdAt"
-          (ngModelChange)="applyFilters()"
-          placeholder="Fecha de creación"
-          dateFormat="yy-mm-dd"
-          showIcon
-          appendTo="body"
-        />
-        <p-calendar
-          [(ngModel)]="filters.startDate"
-          (ngModelChange)="applyFilters()"
-          placeholder="Fecha de inicio"
-          dateFormat="yy-mm-dd"
-          showIcon
-          appendTo="body"
-        />
-        <p-dropdown
-          [options]="statusOptions"
-          [(ngModel)]="filters.statusId"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          class="w-full"
-          (ngModelChange)="applyFilters()"
-        />
-      </div>
-    </section>
+    <app-task-filters
+      [filters]="filters"
+      [statusOptions]="statusOptions"
+      (filtersChanged)="applyFilters()"
+    />
   </p-card>
 
   <div class="flex justify-end w-full gap-2">
-  <!-- Botón Crear Tarea -->
-  <p-button label="Crear Tarea" icon="pi pi-plus" [raised]="true" (onClick)="showCreateModal = true"></p-button>
+    <!-- Botón Crear Tarea -->
+    <p-button
+      label="Crear Tarea"
+      icon="pi pi-plus"
+      [raised]="true"
+      (onClick)="showCreateModal = true"
+    ></p-button>
 
-  <!-- Botón borrar Tareas -->
-  <p-button label="Eliminar Todas" severity="danger"  icon="pi pi-trash" [raised]="true"
-    (onClick)="confirmDeleteAll()"></p-button>
-</div>
-
+    <!-- Botón borrar Tareas -->
+    <p-button
+      label="Eliminar Todas"
+      severity="danger"
+      icon="pi pi-trash"
+      [raised]="true"
+      (onClick)="confirmDeleteAll()"
+    ></p-button>
+  </div>
 
   <!-- Tabla de Tareas -->
   <p-card>
@@ -70,7 +40,6 @@
         [rows]="5"
         [rowsPerPageOptions]="[5, 10, 20]"
         class="p-12"
-
       >
         <ng-template pTemplate="header">
           <tr>

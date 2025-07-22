@@ -6,12 +6,12 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
-import { Task, Subtask } from '../../../../core/models/task.model';
-import { TaskStorageService } from '../../services/task-storage.service';
+import { Task, Subtask } from '../../../../../core/models/task.model';
+import { TaskStorageService } from '../../../services/task-storage.service';
 import { ChipModule } from 'primeng/chip';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import Swal from 'sweetalert2';
-import { formatDateToLocal } from '../../../../shared/utils/date-utils'
+import { formatDateToLocal } from '../../../../../shared/utils/date-utils'
 
 @Component({
   selector: 'task-create-modal',

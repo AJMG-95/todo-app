@@ -1,0 +1,44 @@
+<section class="p-4">
+  <h2 class="text-xl font-semibold mb-4">Filtrar Tareas</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <input
+      type="text"
+      pInputText
+      placeholder="Título"
+      [(ngModel)]="filters.title"
+      (ngModelChange)="onChange()"
+    />
+    <input
+      type="text"
+      pInputText
+      placeholder="Categoría"
+      [(ngModel)]="filters.category"
+      (ngModelChange)="onChange()"
+    />
+    <p-calendar
+      [(ngModel)]="filters.createdAt"
+      (ngModelChange)="onChange()"
+      placeholder="Fecha de creación"
+      dateFormat="yy-mm-dd"
+      showIcon
+      appendTo="body"
+    />
+    <p-calendar
+      [(ngModel)]="filters.startDate"
+      (ngModelChange)="onChange()"
+      placeholder="Fecha de inicio"
+      dateFormat="yy-mm-dd"
+      showIcon
+      appendTo="body"
+    />
+    <p-dropdown
+      [options]="statusOptions"
+      [(ngModel)]="filters.statusId"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      class="w-full"
+      (ngModelChange)="onChange()"
+    />
+  </div>
+</section>

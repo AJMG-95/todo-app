@@ -10,11 +10,13 @@ import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { Status, Subtask, Task } from '../../../../core/models/task.model';
-import { TaskCreateModalComponent } from '../../components/task-create-modal/task-create-modal.component';
-import { TaskDetailModalComponent } from '../../components/task-detail-modal/task-detail-modal.component';
+import { TaskCreateModalComponent } from '../../components/todo/task-create-modal/task-create-modal.component';
+
 import { TaskStorageService } from '../../services/task-storage.service';
 import Swal from 'sweetalert2';
 import { formatDateToLocal } from '../../../../shared/utils/date-utils';
+import { TaskDetailModalComponent } from '../../components/todo/task-detail-modal/task-detail-modal.component';
+import { TaskFiltersComponent } from '../../components/todo/task-filters/task-filters.component';
 
 @Component({
   selector: 'app-todo-page',
@@ -31,6 +33,7 @@ import { formatDateToLocal } from '../../../../shared/utils/date-utils';
     InputTextModule,
     TaskCreateModalComponent,
     TaskDetailModalComponent,
+    TaskFiltersComponent,
   ],
   templateUrl: './todo-page.component.html',
   styleUrl: './todo-page.component.css',
@@ -40,7 +43,6 @@ export class TodoPageComponent implements OnInit {
   statuses: Status[] = [];
   filteredTasks: Task[] = [];
   editingField: { [key: string]: string | null } = {};
-
   statusOptions: { label: string; value: number }[] = [];
 
   filters: {
@@ -84,22 +86,60 @@ export class TodoPageComponent implements OnInit {
   }
 
   applyFilters(): void {
-    const filterParams = {
-      title: this.filters.title || undefined,
-      category: this.filters.category || undefined,
-      createdAt: this.filters.createdAt
-        ? formatDateToLocal(this.filters.createdAt)
-        : undefined,
-      startDate: this.filters.startDate
-        ? formatDateToLocal(this.filters.startDate)
-        : undefined,
-      statusId: this.filters.statusId !== 0 ? this.filters.statusId : undefined, // ← solo filtra si ≠ 0
-    };
+    this.taskService.getTasks().subscribe((tasks) => {
+      this.filteredTasks = tasks.filter((task) => {
+        const { title, category, createdAtStart, createdAtEnd, startDateStart, startDateEnd, estimatedEndDateStart, estimatedEndDateEnd, realEndDateStart, realEndDateEnd, statusId } = this.filters as any;
 
-    this.taskService.getTasks(filterParams).subscribe((tasks) => {
-      this.filteredTasks = tasks;
+        const matchesTitle =
+          !title || task.title.toLowerCase().includes(title.toLowerCase());
+
+        const matchesCategory =
+          !category || task.category.toLowerCase().includes(category.toLowerCase());
+
+        const matchesCreatedAt =
+          (!createdAtStart && !createdAtEnd) ||
+          (createdAtStart && createdAtEnd && task.createdAt >= formatDateToLocal(createdAtStart) && task.createdAt <= formatDateToLocal(createdAtEnd)) ||
+          (createdAtStart && task.createdAt === formatDateToLocal(createdAtStart)) ||
+          (createdAtEnd && task.createdAt === formatDateToLocal(createdAtEnd));
+
+        const matchesStartDate =
+          (!startDateStart && !startDateEnd) ||
+          (startDateStart && startDateEnd && task.startDate >= formatDateToLocal(startDateStart) && task.startDate <= formatDateToLocal(startDateEnd)) ||
+          (startDateStart && task.startDate === formatDateToLocal(startDateStart)) ||
+          (startDateEnd && task.startDate === formatDateToLocal(startDateEnd));
+
+        const matchesEstimatedEndDate =
+          (!estimatedEndDateStart && !estimatedEndDateEnd) ||
+          (estimatedEndDateStart && estimatedEndDateEnd &&
+            task.estimatedEndDate >= formatDateToLocal(estimatedEndDateStart) &&
+            task.estimatedEndDate <= formatDateToLocal(estimatedEndDateEnd)) ||
+          (estimatedEndDateStart && task.estimatedEndDate === formatDateToLocal(estimatedEndDateStart)) ||
+          (estimatedEndDateEnd && task.estimatedEndDate === formatDateToLocal(estimatedEndDateEnd));
+
+        const matchesRealEndDate =
+          (!realEndDateStart && !realEndDateEnd) ||
+          (realEndDateStart && realEndDateEnd &&
+            task.realEndDate! >= formatDateToLocal(realEndDateStart) &&
+            task.realEndDate! <= formatDateToLocal(realEndDateEnd)) ||
+          (realEndDateStart && task.realEndDate === formatDateToLocal(realEndDateStart)) ||
+          (realEndDateEnd && task.realEndDate === formatDateToLocal(realEndDateEnd));
+
+        const matchesStatus =
+          !statusId || statusId === 0 || task.statusId === statusId;
+
+        return (
+          matchesTitle &&
+          matchesCategory &&
+          matchesCreatedAt &&
+          matchesStartDate &&
+          matchesEstimatedEndDate &&
+          matchesRealEndDate &&
+          matchesStatus
+        );
+      });
     });
   }
+
 
   getStatusLabel(statusId: number): string {
     const status = this.statuses.find((s) => s.id === statusId);

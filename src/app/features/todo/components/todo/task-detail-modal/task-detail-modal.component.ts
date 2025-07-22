@@ -5,8 +5,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaskStorageService } from '../../services/task-storage.service';
-import { Subtask, Task } from '../../../../core/models/task.model';
+import { TaskStorageService } from '../../../services/task-storage.service';
+import { Subtask, Task } from '../../../../../core/models/task.model';
 
 @Component({
   selector: 'task-detail-modal',
