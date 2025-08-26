@@ -246,15 +246,21 @@ export class TodoPageComponent implements OnInit {
   }
 
   onStatusChange(task: Task): void {
-    if (task.statusId === 0) {
-      // Restaurar el valor anterior o simplemente salir sin guardar
-      this.applyFilters(); // refresca la lista para evitar inconsistencias
-      return;
+    // 3 = Completada
+    if (task.statusId === 3) {
+      // si no tiene fecha real, la ponemos a hoy
+      if (!task.realEndDate) {
+        task.realEndDate = formatDateToLocal(new Date()); // "YYYY-MM-DD"
+      }
+    } else {
+      // si se desmarca como completada, limpiamos la fecha real
+      task.realEndDate = undefined as any; // (opcional, quita esta línea si prefieres mantenerla)
     }
 
     this.taskService.updateTask(task);
     this.applyFilters();
   }
+
 
   get editableStatusOptions() {
     return this.statusOptions.filter((s) => s.value !== 0);

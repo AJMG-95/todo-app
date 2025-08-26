@@ -75,7 +75,7 @@
       </section>
 
       <!-- Fechas -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
         <section >
           <p-floatlabel variant="on">
             <p-calendar
@@ -101,20 +101,6 @@
               class="w-full"
             ></p-calendar>
             <label for="estimatedEndDate">Fecha Fin estimada</label>
-          </p-floatlabel>
-        </section>
-
-        <section *ngIf="taskToEdit">
-          <p-floatlabel variant="on">
-            <p-calendar
-              formControlName="realEndDate"
-              id="realEndDate"
-              [showIcon]="true"
-              dateFormat="yy-mm-dd"
-              appendTo="body"
-              class="w-full"
-            ></p-calendar>
-            <label for="realEndDate">Fecha real</label>
           </p-floatlabel>
         </section>
       </div>
@@ -154,7 +140,7 @@
             class="p-button-sm min-w-[128px]"
             label="Añadir"
             (click)="addSubtask(newSubtaskText)"
-            [disabled]="!newSubtaskText?.trim()"
+            [disabled]="!newSubtaskText.trim()"
           ></button>
         </div>
 

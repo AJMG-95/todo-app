@@ -67,7 +67,6 @@
             </th>
             <th>
               Fecha Finalización
-              <i class="pi pi-pencil ml-1 text-xs text-gray-400"></i>
             </th>
             <th>Acciones</th>
           </tr>
@@ -80,6 +79,7 @@
               (click)="
                 !isEditing(task.id, 'title') && startEditing(task.id, 'title')
               "
+              class="cursor-pointer"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'title'); else titleDisplay"
@@ -118,7 +118,7 @@
                 !isEditing(task.id, 'description') &&
                   startEditing(task.id, 'description')
               "
-              style="cursor: pointer"
+              class="cursor-pointer"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'description'); else descDisplay"
@@ -160,7 +160,7 @@
                 !isEditing(task.id, 'category') &&
                   startEditing(task.id, 'category')
               "
-              style="cursor: pointer"
+class="cursor-pointer"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'category'); else categoryDisplay"
@@ -196,7 +196,7 @@
             </td>
 
             <!-- Estado -->
-            <td>
+            <td class="cursor-pointer">
               <p-dropdown
                 [options]="editableStatusOptions"
                 [(ngModel)]="task.statusId"
@@ -225,6 +225,7 @@
                 !isEditing(task.id, 'startDate') &&
                   startEditing(task.id, 'startDate')
               "
+              class="cursor-pointer"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'startDate'); else startDisplay"
@@ -266,6 +267,7 @@
                 !isEditing(task.id, 'estimatedEndDate') &&
                   startEditing(task.id, 'estimatedEndDate')
               "
+              class="cursor-pointer"
             >
               <ng-container
                 *ngIf="
@@ -307,46 +309,10 @@
               </ng-template>
             </td>
 
-            <td
-              (click)="
-                !isEditing(task.id, 'realEndDate') &&
-                  startEditing(task.id, 'realEndDate')
-              "
-            >
-              <ng-container
-                *ngIf="isEditing(task.id, 'realEndDate'); else realDisplay"
-              >
-                <p-calendar
-                  [(ngModel)]="task.realEndDate"
-                  dateFormat="yy-mm-dd"
-                  showIcon
-                  (click)="$event.stopPropagation()"
-                  appendTo="body"
-                ></p-calendar>
-                <div class="flex gap-1 mt-1">
-                  <button
-                    pButton
-                    icon="pi pi-check"
-                    class="p-button-sm p-button-success"
-                    (click)="
-                      saveEdit(task, 'realEndDate'); $event.stopPropagation()
-                    "
-                  ></button>
-                  <button
-                    pButton
-                    icon="pi pi-times"
-                    class="p-button-sm p-button-danger"
-                    (click)="
-                      cancelEdit(task.id, 'realEndDate');
-                      $event.stopPropagation()
-                    "
-                  ></button>
-                </div>
-              </ng-container>
-              <ng-template #realDisplay>
-                <i class="pi pi-calendar mr-1 text-gray-400"></i>
-                <span>{{ task.realEndDate }}</span>
-              </ng-template>
+            <!-- Fecha Finalización (solo lectura) -->
+            <td>
+              <i class="pi pi-calendar mr-1 text-gray-400"></i>
+              <span>{{ task.realEndDate || "—" }}</span>
             </td>
 
             <!-- Acciones -->
