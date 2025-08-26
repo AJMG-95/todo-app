@@ -1,9 +1,10 @@
 <!-- src/app/features/todo/pages/stats-page/stats-page.component.html -->
 
 <section class="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 space-y-6">
-
-  <!-- KPIs: misma rejilla, mejor en breakpoints -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 mb-2">
+  <!-- KPIs-->
+  <div
+    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 mb-2"
+  >
     <p-card class="kpi text-center p-4 sm:p-5">
       <div class="kpi-title text-xs sm:text-sm">Total</div>
       <div class="kpi-value text-2xl sm:text-3xl">{{ kpis.total }}</div>
@@ -26,12 +27,16 @@
 
     <p-card class="kpi text-center p-4 sm:p-5">
       <div class="kpi-title text-xs sm:text-sm">Abiertas vencidas</div>
-      <div class="kpi-value text-2xl sm:text-3xl warn">{{ kpis.openOverdue }}</div>
+      <div class="kpi-value text-2xl sm:text-3xl warn">
+        {{ kpis.openOverdue }}
+      </div>
     </p-card>
 
     <p-card class="kpi text-center p-4 sm:p-5">
       <div class="kpi-title text-xs sm:text-sm">On-time rate</div>
-      <div class="kpi-value text-2xl sm:text-3xl">{{ kpis.onTimeRatePct }}%</div>
+      <div class="kpi-value text-2xl sm:text-3xl">
+        {{ kpis.onTimeRatePct }}%
+      </div>
       <small class="muted block mt-1 text-[11px] sm:text-xs">
         entre completadas con fecha estimada ({{ kpis.closedWithEstimate }})
       </small>
@@ -39,73 +44,93 @@
 
     <p-card class="kpi text-center p-4 sm:p-5">
       <div class="kpi-title text-xs sm:text-sm">Ciclo medio</div>
-      <div class="kpi-value text-2xl sm:text-3xl">{{ kpis.avgCycleDays ?? '–' }}</div>
-      <small class="muted block mt-1 text-[11px] sm:text-xs">inicio → fin real (días)</small>
+      <div class="kpi-value text-2xl sm:text-3xl">
+        {{ kpis.avgCycleDays ?? "–" }}
+      </div>
+      <small class="muted block mt-1 text-[11px] sm:text-xs"
+        >inicio → fin real (días)</small
+      >
     </p-card>
 
     <p-card class="kpi text-center p-4 sm:p-5">
       <div class="kpi-title text-xs sm:text-sm">Lead time medio</div>
-      <div class="kpi-value text-2xl sm:text-3xl">{{ kpis.avgLeadDays ?? '–' }}</div>
-      <small class="muted block mt-1 text-[11px] sm:text-xs">creación → fin real (días)</small>
+      <div class="kpi-value text-2xl sm:text-3xl">
+        {{ kpis.avgLeadDays ?? "–" }}
+      </div>
+      <small class="muted block mt-1 text-[11px] sm:text-xs"
+        >creación → fin real (días)</small
+      >
     </p-card>
 
     <p-card class="kpi text-center p-4 sm:p-5">
       <div class="kpi-title text-xs sm:text-sm">Varianza de plazo</div>
-      <div class="kpi-value text-2xl sm:text-3xl" [ngClass]="{
+      <div
+        class="kpi-value text-2xl sm:text-3xl"
+        [ngClass]="{
           'good text-green-600': (kpis.avgScheduleVarianceDays ?? 0) > 0,
           'warn text-yellow-600': (kpis.avgScheduleVarianceDays ?? 0) < 0
-        }">
-        {{ kpis.avgScheduleVarianceDays ?? '–' }}
+        }"
+      >
+        {{ kpis.avgScheduleVarianceDays ?? "–" }}
       </div>
-      <small class="muted block mt-1 text-[11px] sm:text-xs">(+ antes, − retraso) (días)</small>
+      <small class="muted block mt-1 text-[11px] sm:text-xs"
+        >(+ antes, − retraso) (días)</small
+      >
     </p-card>
   </div>
 
   <p-divider class="my-2 sm:my-4"></p-divider>
 
-  <!-- Gráficas: MISMA DISPOSICIÓN -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 m-auto lg:items-center">
+  <!-- Gráficas -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 m-auto lg:items-center">
+    <!-- Columna izquierda -->
+    <div class="h-full p-auto">
+      <p-card [styleClass]="'h-full flex flex-col p-3 m-auto'">
+        <h3 class="text-sm md:text-base font-semibold mb-2 text-center">
+          Puntualidad y estado
+        </h3>
 
-  <!-- Columna izquierda: misma altura que la derecha en lg, con el mínimo espacio -->
-  <div class="h-full p-auto">
-    <p-card [styleClass]="'h-full flex flex-col p-3 m-auto'">
-      <h3 class="text-sm md:text-base font-semibold mb-2 text-center">
-        Puntualidad y estado
-      </h3>
+        <div class="flex-1 min-h-0 m-auto">
+          <p-chart
+            styleClass="w-full h-full"
+            type="pie"
+            [data]="pieData"
+            [options]="pieOptions"
+          >
+          </p-chart>
+        </div>
+      </p-card>
+    </div>
 
-      <!-- El chart rellena el resto; sin min-height para no forzar altura -->
-      <div class="flex-1 min-h-0 m-auto">
-        <p-chart styleClass="w-full h-full" type="pie" [data]="pieData" [options]="pieOptions">
-        </p-chart>
-      </div>
-    </p-card>
+    <!-- Columna derecha -->
+    <div class="flex flex-col gap-6 h-full justify-center">
+      <p-card [styleClass]="'p-3'">
+        <h3 class="text-sm md:text-base font-semibold mb-2">
+          Completadas por mes (últimos 6)
+        </h3>
+        <div class="w-full h-full">
+          <p-chart
+            styleClass="w-full h-full"
+            type="bar"
+            [data]="doneByMonthData"
+            [options]="doneByMonthOptions"
+          ></p-chart>
+        </div>
+      </p-card>
+
+      <p-card [styleClass]="'p-3'">
+        <h3 class="text-sm md:text-base font-semibold mb-2">
+          Ciclo medio por categoría
+        </h3>
+        <div class="w-full h-full">
+          <p-chart
+            styleClass="w-full h-full"
+            type="bar"
+            [data]="cycleByCategoryData"
+            [options]="cycleByCategoryOptions"
+          ></p-chart>
+        </div>
+      </p-card>
+    </div>
   </div>
-
-  <!-- Columna derecha: dos cards apiladas, alturas reducidas -->
-<div class="flex flex-col gap-6 h-full justify-center">
-  <p-card [styleClass]="'p-3'">
-    <h3 class="text-sm md:text-base font-semibold mb-2">
-      Completadas por mes (últimos 6)
-    </h3>
-    <div class="w-full h-full">
-      <p-chart styleClass="w-full h-full" type="bar" [data]="doneByMonthData" [options]="doneByMonthOptions"></p-chart>
-    </div>
-  </p-card>
-
-  <p-card [styleClass]="'p-3'">
-    <h3 class="text-sm md:text-base font-semibold mb-2">
-      Ciclo medio por categoría
-    </h3>
-    <div class="w-full h-full">
-      <p-chart styleClass="w-full h-full" type="bar" [data]="cycleByCategoryData"
-        [options]="cycleByCategoryOptions"></p-chart>
-    </div>
-  </p-card>
-</div>
-
-
-</div>
-
-
-
 </section>
