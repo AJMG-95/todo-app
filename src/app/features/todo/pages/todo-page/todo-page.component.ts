@@ -1,10 +1,9 @@
-//src\app\features\todo\pages\todo-page\todo-page.component.ts
+// src/app/features/todo/pages/todo-page/todo-page.component.ts
 
 import { NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -27,7 +26,6 @@ import { TaskFiltersComponent } from '../../components/todo/task-filters/task-fi
     FormsModule,
     CardModule,
     TableModule,
-    CalendarModule,
     DropdownModule,
     ButtonModule,
     InputTextModule,
@@ -52,21 +50,29 @@ export class TodoPageComponent implements OnInit {
     startDate?: Date | null;
     statusId?: number;
   } = {
-    title: undefined,
-    category: undefined,
-    createdAt: null,
-    startDate: null,
-    statusId: 0,
-  };
+      title: undefined,
+      category: undefined,
+      createdAt: null,
+      startDate: null,
+      statusId: 0,
+    };
 
   showCreateModal: boolean = false;
   selectedTask: Task | null = null;
   selectedSubtasks: Subtask[] = [];
   showDetailModal: boolean = false;
 
+  // Buffers para edición inline de fechas (strings "YYYY-MM-DD")
+  dateEditBufferStr: {
+    [taskId: string]: {
+      startDate?: string | null;
+      estimatedEndDate?: string | null;
+    };
+  } = {};
+
   private taskBackup: { [taskId: string]: Task } = {};
 
-  constructor(private taskService: TaskStorageService) {}
+  constructor(private taskService: TaskStorageService) { }
 
   ngOnInit(): void {
     this.loadStatuses();
@@ -88,41 +94,69 @@ export class TodoPageComponent implements OnInit {
   applyFilters(): void {
     this.taskService.getTasks().subscribe((tasks) => {
       this.filteredTasks = tasks.filter((task) => {
-        const { title, category, createdAtStart, createdAtEnd, startDateStart, startDateEnd, estimatedEndDateStart, estimatedEndDateEnd, realEndDateStart, realEndDateEnd, statusId } = this.filters as any;
+        const {
+          title,
+          category,
+          createdAtStart,
+          createdAtEnd,
+          startDateStart,
+          startDateEnd,
+          estimatedEndDateStart,
+          estimatedEndDateEnd,
+          realEndDateStart,
+          realEndDateEnd,
+          statusId,
+        } = this.filters as any;
 
         const matchesTitle =
           !title || task.title.toLowerCase().includes(title.toLowerCase());
 
         const matchesCategory =
-          !category || task.category.toLowerCase().includes(category.toLowerCase());
+          !category ||
+          task.category.toLowerCase().includes(category.toLowerCase());
 
         const matchesCreatedAt =
           (!createdAtStart && !createdAtEnd) ||
-          (createdAtStart && createdAtEnd && task.createdAt >= formatDateToLocal(createdAtStart) && task.createdAt <= formatDateToLocal(createdAtEnd)) ||
-          (createdAtStart && task.createdAt === formatDateToLocal(createdAtStart)) ||
+          (createdAtStart &&
+            createdAtEnd &&
+            task.createdAt >= formatDateToLocal(createdAtStart) &&
+            task.createdAt <= formatDateToLocal(createdAtEnd)) ||
+          (createdAtStart &&
+            task.createdAt === formatDateToLocal(createdAtStart)) ||
           (createdAtEnd && task.createdAt === formatDateToLocal(createdAtEnd));
 
         const matchesStartDate =
           (!startDateStart && !startDateEnd) ||
-          (startDateStart && startDateEnd && task.startDate >= formatDateToLocal(startDateStart) && task.startDate <= formatDateToLocal(startDateEnd)) ||
-          (startDateStart && task.startDate === formatDateToLocal(startDateStart)) ||
+          (startDateStart &&
+            startDateEnd &&
+            task.startDate >= formatDateToLocal(startDateStart) &&
+            task.startDate <= formatDateToLocal(startDateEnd)) ||
+          (startDateStart &&
+            task.startDate === formatDateToLocal(startDateStart)) ||
           (startDateEnd && task.startDate === formatDateToLocal(startDateEnd));
 
         const matchesEstimatedEndDate =
           (!estimatedEndDateStart && !estimatedEndDateEnd) ||
-          (estimatedEndDateStart && estimatedEndDateEnd &&
+          (estimatedEndDateStart &&
+            estimatedEndDateEnd &&
             task.estimatedEndDate >= formatDateToLocal(estimatedEndDateStart) &&
             task.estimatedEndDate <= formatDateToLocal(estimatedEndDateEnd)) ||
-          (estimatedEndDateStart && task.estimatedEndDate === formatDateToLocal(estimatedEndDateStart)) ||
-          (estimatedEndDateEnd && task.estimatedEndDate === formatDateToLocal(estimatedEndDateEnd));
+          (estimatedEndDateStart &&
+            task.estimatedEndDate ===
+            formatDateToLocal(estimatedEndDateStart)) ||
+          (estimatedEndDateEnd &&
+            task.estimatedEndDate === formatDateToLocal(estimatedEndDateEnd));
 
         const matchesRealEndDate =
           (!realEndDateStart && !realEndDateEnd) ||
-          (realEndDateStart && realEndDateEnd &&
+          (realEndDateStart &&
+            realEndDateEnd &&
             task.realEndDate! >= formatDateToLocal(realEndDateStart) &&
             task.realEndDate! <= formatDateToLocal(realEndDateEnd)) ||
-          (realEndDateStart && task.realEndDate === formatDateToLocal(realEndDateStart)) ||
-          (realEndDateEnd && task.realEndDate === formatDateToLocal(realEndDateEnd));
+          (realEndDateStart &&
+            task.realEndDate === formatDateToLocal(realEndDateStart)) ||
+          (realEndDateEnd &&
+            task.realEndDate === formatDateToLocal(realEndDateEnd));
 
         const matchesStatus =
           !statusId || statusId === 0 || task.statusId === statusId;
@@ -139,7 +173,6 @@ export class TodoPageComponent implements OnInit {
       });
     });
   }
-
 
   getStatusLabel(statusId: number): string {
     const status = this.statuses.find((s) => s.id === statusId);
@@ -192,48 +225,91 @@ export class TodoPageComponent implements OnInit {
   }
 
   startEditing(taskId: string, field: keyof Task): void {
+    const task = this.filteredTasks.find((t) => t.id === taskId);
+    if (!task) return;
+
+    // 🚫 Si está completada, no permitimos editar nada
+    if (this.isCompleted(task)) return;
+
     this.editingField[`${taskId}_${field}`] = field;
 
-    // Solo guardar una vez por campo, si no existe ya
     if (!this.taskBackup[taskId]) {
-      const original = this.filteredTasks.find((t) => t.id === taskId);
-      if (original) {
-        this.taskBackup[taskId] = JSON.parse(JSON.stringify(original));
-      }
+      this.taskBackup[taskId] = JSON.parse(JSON.stringify(task));
+    }
+
+    if (!this.dateEditBufferStr[taskId]) this.dateEditBufferStr[taskId] = {};
+    if (field === 'startDate') {
+      this.dateEditBufferStr[taskId].startDate = task.startDate || '';
+    }
+    if (field === 'estimatedEndDate') {
+      this.dateEditBufferStr[taskId].estimatedEndDate = task.estimatedEndDate || '';
     }
   }
 
+  // Handler genérico para cambios de los <input type="date">
+  onDateBufferStrChange(
+    taskId: string,
+    field: 'startDate' | 'estimatedEndDate',
+    value: string | null
+  ) {
+    if (!this.dateEditBufferStr[taskId]) this.dateEditBufferStr[taskId] = {};
+    this.dateEditBufferStr[taskId][field] = value ?? '';
+  }
+
+  // Guarda cambios: copia desde buffer string -> modelo (string "YYYY-MM-DD")
   saveEdit(task: Task, field: keyof Task): void {
+    // Aplicar buffers si edito fechas
+    if (field === 'startDate') {
+      task.startDate = this.dateEditBufferStr[task.id]?.startDate || '';
+    }
+    if (field === 'estimatedEndDate') {
+      task.estimatedEndDate = this.dateEditBufferStr[task.id]?.estimatedEndDate || '';
+    }
+
+    // ✅ Validación: si ambas existen, startDate ≤ estimatedEndDate
+    const start = (task.startDate || '').trim();
+    const end = (task.estimatedEndDate || '').trim();
+    if (start && end && end < start) {
+      // Revertimos el campo editado a su backup y mostramos alerta
+      const backup = this.taskBackup[task.id];
+      if (backup) {
+        this.restoreField(task, backup, field);
+      }
+      Swal.fire({
+        icon: 'error',
+        title: 'Fechas inválidas',
+        text: 'La fecha de inicio no puede ser posterior a la fecha fin estimada.',
+        confirmButtonText: 'Entendido',
+      });
+      return; // No guardamos ni salimos del modo edición; el usuario corrige
+    }
+
     this.taskService.updateTask(task);
     delete this.editingField[`${task.id}_${field}`];
 
-    // Si ya no se edita ningún otro campo, borra backup
-    const stillEditing = Object.keys(this.editingField).some((key) =>
-      key.startsWith(task.id)
-    );
+    const stillEditing = Object.keys(this.editingField).some((key) => key.startsWith(task.id));
     if (!stillEditing) {
       delete this.taskBackup[task.id];
+      delete this.dateEditBufferStr[task.id];
     }
 
     this.applyFilters();
   }
 
+
   cancelEdit(taskId: string, field: keyof Task): void {
     const backup = this.taskBackup[taskId];
     const task = this.filteredTasks.find((t) => t.id === taskId);
-
-    if (backup && task) {
-      this.restoreField(task, backup, field);
-    }
+    if (backup && task) this.restoreField(task, backup, field);
 
     delete this.editingField[`${taskId}_${field}`];
 
-    // Limpia backup si ya no se está editando ningún campo de esa tarea
     const stillEditing = Object.keys(this.editingField).some((key) =>
       key.startsWith(taskId)
     );
     if (!stillEditing) {
       delete this.taskBackup[taskId];
+      delete this.dateEditBufferStr[taskId];
     }
   }
 
@@ -254,13 +330,12 @@ export class TodoPageComponent implements OnInit {
       }
     } else {
       // si se desmarca como completada, limpiamos la fecha real
-      task.realEndDate = undefined as any; // (opcional, quita esta línea si prefieres mantenerla)
+      task.realEndDate = undefined as any;
     }
 
     this.taskService.updateTask(task);
     this.applyFilters();
   }
-
 
   get editableStatusOptions() {
     return this.statusOptions.filter((s) => s.value !== 0);
@@ -303,4 +378,19 @@ export class TodoPageComponent implements OnInit {
       }
     });
   }
+
+  getStartDateBuffer(taskId: string): string {
+    const b = this.dateEditBufferStr[taskId];
+    return (b && b.startDate) ? b.startDate : '';
+  }
+
+  getEstimatedEndDateBuffer(taskId: string): string {
+    const b = this.dateEditBufferStr[taskId];
+    return (b && b.estimatedEndDate) ? b.estimatedEndDate : '';
+  }
+
+  isCompleted(task: Task): boolean {
+    return task.statusId === 3;
+  }
+
 }

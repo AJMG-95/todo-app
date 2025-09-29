@@ -11,7 +11,6 @@
   </p-card>
 
   <div class="flex justify-end w-full gap-2">
-    <!-- Botón Crear Tarea -->
     <p-button
       label="Crear Tarea"
       icon="pi pi-plus"
@@ -19,7 +18,6 @@
       (onClick)="showCreateModal = true"
     ></p-button>
 
-    <!-- Botón borrar Tareas -->
     <p-button
       label="Eliminar Todas"
       severity="danger"
@@ -65,21 +63,21 @@
               Fecha Fin Estimada
               <i class="pi pi-pencil ml-1 text-xs text-gray-400"></i>
             </th>
-            <th>
-              Fecha Finalización
-            </th>
+            <th>Fecha Finalización</th>
             <th>Acciones</th>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-task>
-          <tr>
+          <tr [class.opacity-60]="isCompleted(task)">
             <!-- Título -->
             <td
               (click)="
-                !isEditing(task.id, 'title') && startEditing(task.id, 'title')
+                !isCompleted(task) &&
+                  !isEditing(task.id, 'title') &&
+                  startEditing(task.id, 'title')
               "
-              class="cursor-pointer"
+              [class]="!isCompleted(task) ? 'cursor-pointer' : ''"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'title'); else titleDisplay"
@@ -107,18 +105,19 @@
                   ></button>
                 </div>
               </ng-container>
-              <ng-template #titleDisplay>
-                <span>{{ task.title }}</span>
-              </ng-template>
+              <ng-template #titleDisplay
+                ><span>{{ task.title }}</span></ng-template
+              >
             </td>
 
             <!-- Descripción -->
             <td
               (click)="
-                !isEditing(task.id, 'description') &&
+                !isCompleted(task) &&
+                  !isEditing(task.id, 'description') &&
                   startEditing(task.id, 'description')
               "
-              class="cursor-pointer"
+              [class]="!isCompleted(task) ? 'cursor-pointer' : ''"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'description'); else descDisplay"
@@ -149,18 +148,19 @@
                   ></button>
                 </div>
               </ng-container>
-              <ng-template #descDisplay>
-                <span>{{ task.description }}</span>
-              </ng-template>
+              <ng-template #descDisplay
+                ><span>{{ task.description }}</span></ng-template
+              >
             </td>
 
             <!-- Categoría -->
             <td
               (click)="
-                !isEditing(task.id, 'category') &&
+                !isCompleted(task) &&
+                  !isEditing(task.id, 'category') &&
                   startEditing(task.id, 'category')
               "
-class="cursor-pointer"
+              [class]="!isCompleted(task) ? 'cursor-pointer' : ''"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'category'); else categoryDisplay"
@@ -190,19 +190,18 @@ class="cursor-pointer"
                   ></button>
                 </div>
               </ng-container>
-              <ng-template #categoryDisplay>
-                <span>{{ task.category }}</span>
-              </ng-template>
+              <ng-template #categoryDisplay
+                ><span>{{ task.category }}</span></ng-template
+              >
             </td>
 
             <!-- Estado -->
-            <td class="cursor-pointer">
+            <td [class]="!isCompleted(task) ? 'cursor-pointer' : ''">
               <p-dropdown
                 [options]="editableStatusOptions"
                 [(ngModel)]="task.statusId"
                 optionLabel="label"
                 optionValue="value"
-                appendTo="body"
                 [ngClass]="{
                   'bg-gray-200': task.statusId === 1,
                   'bg-yellow-100': task.statusId === 2,
@@ -211,7 +210,12 @@ class="cursor-pointer"
                 }"
                 class="w-full"
                 (onChange)="onStatusChange(task)"
-              />
+                [appendTo]="'body'"
+                panelStyleClass="status-dropdown-panel"
+                [autoZIndex]="true"
+                [baseZIndex]="2000"
+                [disabled]="isCompleted(task)"
+              ></p-dropdown>
             </td>
 
             <!-- Fechas -->
@@ -220,23 +224,31 @@ class="cursor-pointer"
               {{ task.createdAt }}
             </td>
 
+            <!-- startDate (input nativo) -->
             <td
               (click)="
-                !isEditing(task.id, 'startDate') &&
+                !isCompleted(task) &&
+                  !isEditing(task.id, 'startDate') &&
                   startEditing(task.id, 'startDate')
               "
-              class="cursor-pointer"
+              [class]="!isCompleted(task) ? 'cursor-pointer' : ''"
             >
               <ng-container
                 *ngIf="isEditing(task.id, 'startDate'); else startDisplay"
               >
-                <p-calendar
-                  [(ngModel)]="task.startDate"
-                  dateFormat="yy-mm-dd"
-                  showIcon
+                <input
+                  type="date"
+                  class="w-full p-inputtext p-component"
+                  [ngModel]="
+                    (dateEditBufferStr[task.id] &&
+                      dateEditBufferStr[task.id].startDate) ||
+                    ''
+                  "
+                  (ngModelChange)="
+                    onDateBufferStrChange(task.id, 'startDate', $event)
+                  "
                   (click)="$event.stopPropagation()"
-                  appendTo="body"
-                ></p-calendar>
+                />
                 <div class="flex gap-1 mt-1">
                   <button
                     pButton
@@ -262,12 +274,14 @@ class="cursor-pointer"
               </ng-template>
             </td>
 
+            <!-- estimatedEndDate (input nativo) -->
             <td
               (click)="
-                !isEditing(task.id, 'estimatedEndDate') &&
+                !isCompleted(task) &&
+                  !isEditing(task.id, 'estimatedEndDate') &&
                   startEditing(task.id, 'estimatedEndDate')
               "
-              class="cursor-pointer"
+              [class]="!isCompleted(task) ? 'cursor-pointer' : ''"
             >
               <ng-container
                 *ngIf="
@@ -275,13 +289,19 @@ class="cursor-pointer"
                   else estimatedDisplay
                 "
               >
-                <p-calendar
-                  [(ngModel)]="task.estimatedEndDate"
-                  dateFormat="yy-mm-dd"
-                  showIcon
+                <input
+                  type="date"
+                  class="w-full p-inputtext p-component"
+                  [ngModel]="
+                    (dateEditBufferStr[task.id] &&
+                      dateEditBufferStr[task.id].estimatedEndDate) ||
+                    ''
+                  "
+                  (ngModelChange)="
+                    onDateBufferStrChange(task.id, 'estimatedEndDate', $event)
+                  "
                   (click)="$event.stopPropagation()"
-                  appendTo="body"
-                ></p-calendar>
+                />
                 <div class="flex gap-1 mt-1">
                   <button
                     pButton
@@ -322,13 +342,13 @@ class="cursor-pointer"
                 icon="pi pi-eye"
                 class="p-button-sm p-button-text"
                 (click)="watchTask(task)"
-                clas
               ></button>
               <button
                 pButton
                 icon="pi pi-pencil"
                 class="p-button-sm p-button-text text-blue-500"
                 (click)="editTask(task)"
+                [disabled]="isCompleted(task)"
               ></button>
               <button
                 pButton
