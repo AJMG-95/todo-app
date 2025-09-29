@@ -1,5 +1,3 @@
-// src/app/shared/utils/date-utils.ts
-
 export function formatDateToLocal(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');

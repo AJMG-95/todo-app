@@ -1,4 +1,3 @@
-// src/app/features/todo/components/task-filters/task-filters.component.ts
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

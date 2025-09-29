@@ -1,4 +1,3 @@
-// src/app/features/todo/todo.routes.ts
 import { Routes } from '@angular/router';
 import { TodoPageComponent } from './pages/todo-page/todo-page.component';
 import { StatsPageComponent } from './pages/stats-page/stats-page.component';

@@ -61,15 +61,14 @@ export class TaskCreateModalComponent {
       description: ['', Validators.required],
       category: [''],
       startDate: [null],                              // string | null
-      estimatedEndDate: [null, Validators.required],  // string requerido
+      estimatedEndDate: [null, Validators.required],  // string
       realEndDate: [null],                            // string | null
       tags: [''],
       statusId: [1, Validators.required]
     });
 
-    // ✅ Validador SINCRONO a nivel de formulario:
+    // Validador SINCRONO a nivel de formulario:
     // exige que estimatedEndDate >= startDate cuando startDate exista.
-    // (No es un validador asíncrono, por eso usamos setValidators y no setAsyncValidators)
     this.taskForm.setValidators(this.#dateOrderValidator());
 
     // recalcula el estado de validación inicial
@@ -115,7 +114,7 @@ export class TaskCreateModalComponent {
       this.taskForm.markAsPristine();
       this.initialSubtasksJson = JSON.stringify(this.subtasks);
 
-      // ⚖️ Recalcular validaciones del formulario (incluye el validador cruzado de fechas)
+      // Recalcular validaciones del formulario (incluye el validador cruzado de fechas)
       // emitEvent:false evita disparar valueChanges innecesarios durante el ciclo de OnChanges.
       this.taskForm.updateValueAndValidity({ emitEvent: false });
     }

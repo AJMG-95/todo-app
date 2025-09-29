@@ -31,7 +31,7 @@ describe('TaskStorageService', () => {
 
   const sampleStatus: Status = {
     id: 1,
-    nameStatus: 'pendiente'
+    nameStatus: 'Pendiente'
   };
 
   // Este bloque se ejecuta antes de cada prueba individual
@@ -159,7 +159,7 @@ describe('TaskStorageService', () => {
   it('should retrieve a status by ID', (done) => {
     localStorage.setItem('statuses', JSON.stringify([sampleStatus]));
     service.getStatusById(1).subscribe(status => {
-      expect(status?.nameStatus).toBe('pendiente');
+      expect(status?.nameStatus).toBe('Pendiente');
       done();
     });
   });

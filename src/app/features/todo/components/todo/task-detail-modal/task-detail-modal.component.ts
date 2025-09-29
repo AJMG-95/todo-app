@@ -1,4 +1,3 @@
-// src\app\features\todo\components\task-detail-modal\task-detail-modal.component.ts
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -24,7 +23,7 @@ export class TaskDetailModalComponent implements OnInit, OnChanges {
   @Input() visible = false;
   @Output() visibleChange = new EventEmitter<boolean>();
 
-  @Input() task!: Task; // 🔄 Ahora recibimos la task directamente
+  @Input() task!: Task;
   subtasks: Subtask[] = [];
 
   constructor(private taskService: TaskStorageService) { }

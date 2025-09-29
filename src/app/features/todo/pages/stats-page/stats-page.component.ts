@@ -1,4 +1,3 @@
-// src/app/features/todo/pages/stats-page/stats-page.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
@@ -18,7 +17,6 @@ import type { Kpis } from '../../../../core/models/kpi.interface';
   styleUrls: ['./stats-page.component.css'],
 })
 export class StatsPageComponent implements OnInit {
-  // === estado (igual estilo que TodoPage) ===
   tasks: Task[] = [];
   statuses: Status[] = [];
   statusMap: Record<number, Status['nameStatus']> = {};
@@ -42,7 +40,7 @@ export class StatsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStatuses();
-    this.loadTasks(); // ← como haces en TodoPage (applyFilters allí)
+    this.loadTasks();
   }
 
   private loadStatuses(): void {

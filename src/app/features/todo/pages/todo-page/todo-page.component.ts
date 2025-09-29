@@ -1,5 +1,3 @@
-// src/app/features/todo/pages/todo-page/todo-page.component.ts
-
 import { NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -228,7 +226,7 @@ export class TodoPageComponent implements OnInit {
     const task = this.filteredTasks.find((t) => t.id === taskId);
     if (!task) return;
 
-    // 🚫 Si está completada, no permitimos editar nada
+    // Si está completada, no se permite la edición de ningun campo
     if (this.isCompleted(task)) return;
 
     this.editingField[`${taskId}_${field}`] = field;
@@ -266,7 +264,7 @@ export class TodoPageComponent implements OnInit {
       task.estimatedEndDate = this.dateEditBufferStr[task.id]?.estimatedEndDate || '';
     }
 
-    // ✅ Validación: si ambas existen, startDate ≤ estimatedEndDate
+    // Validación: si ambas existen, startDate ≤ estimatedEndDate
     const start = (task.startDate || '').trim();
     const end = (task.estimatedEndDate || '').trim();
     if (start && end && end < start) {
